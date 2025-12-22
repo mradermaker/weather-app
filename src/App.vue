@@ -1,4 +1,14 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from 'vue'
+import SearchBar from './components/SearchBar.vue'
+
+const lastSearch = ref<string | null>(null)
+
+function handleSearch(city: string) {
+  console.log('Suche gestartet für:', city)
+  lastSearch.value = city
+}
+</script>
 
 <template>
   <header class="header">
@@ -7,7 +17,16 @@
       <p class="header__subtitle">Aktuelle Wetterdaten & Vorhersage.</p>
     </div>
   </header>
-  <main id="main-content" class="main container"></main>
+  <main id="main-content" class="main container">
+    <section class="search section" aria-labelledby="search-title">
+      <h2 id="search-title" class="search__title">Ort suchen</h2>
+      <SearchBar @search="handleSearch" />
+      <p v-if="lastSearch" class="search__text">
+        Zuletzt gesuchter Ort:
+        <strong>{{ lastSearch }}</strong>
+      </p>
+    </section>
+  </main>
   <footer class="footer">
     <div class="footer__inner container">
       <p class="footer__text">

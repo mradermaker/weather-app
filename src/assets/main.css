@@ -28,8 +28,9 @@
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
   --space-md: 1rem;
-  --space-lg: 1.5rem;
-  --space-xl: 2rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-xxl: 5rem;
 
   /* Radius */
   --radius-sm: 0.25rem;
@@ -44,6 +45,7 @@
     --color-bg-card: #172036;
     --color-text: #e5e7eb;
     --color-primary: #38bdf8;
+    --color-primary-text: var(--color-bg);
 
     --shadow-sm: none;
     --shadow-md: none;
@@ -151,6 +153,11 @@ button {
   }
 }
 
+/* Section */
+.section {
+  padding-block: var(--space-xxl);
+}
+
 /* ------------------------------
    4. Reusable Blocks
 ---------------------------------*/
@@ -188,6 +195,46 @@ button {
 .button:focus-visible {
   outline: 2px solid var(--color-primary-hover);
   outline-offset: 2px;
+}
+
+/* Form elements */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.field__label {
+  font-size: var(--font-size-small);
+  font-weight: 400;
+}
+
+.field__control {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-round);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg-card);
+  font-size: var(--font-size-base);
+  font-weight: 300;
+  outline: none;
+}
+
+input::placeholder {
+  color: color-mix(in srgb, var(--color-text) 40%, transparent);
+}
+
+.input:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
 }
 
 /* ------------------------------
