@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import SearchBar from './components/SearchBar.vue'
+import { searchCity } from '@/services/weatherApi'
 
 const lastSearch = ref<string | null>(null)
 
-function handleSearch(city: string) {
-  console.log('Suche gestartet für:', city)
+async function handleSearch(city: string) {
+  const location = await searchCity(city)
+  console.log(location)
   lastSearch.value = city
 }
 </script>
