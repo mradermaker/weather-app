@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import SearchBar from './components/SearchBar.vue'
-import { searchCity } from '@/services/weatherApi'
+import { searchCity, fetchCurrentWeather } from '@/services/weatherApi'
+import type { CurrentWeather } from '@/types/weather'
 
 const STORAGE_KEY = 'weather-app:last-city' // namespaced to avoid collisions with other apps
 const DEFAULT_CITY = 'Berlin'
@@ -17,6 +18,8 @@ function getInitialCity(): string {
 
 const lastSearch = ref<string>(getInitialCity())
 
+const currentWeather = ref<CurrentWeather | null>(null)
+
 async function handleSearch(city: string) {
   const location = await searchCity(city)
   if (!location) return
@@ -24,6 +27,8 @@ async function handleSearch(city: string) {
   console.log(location)
   lastSearch.value = city
   localStorage.setItem(STORAGE_KEY, city)
+
+  currentWeather.value = await fetchCurrentWeather(location)
 }
 
 // trigger initial search after first render
@@ -46,6 +51,9 @@ onMounted(() => {
       <p v-if="lastSearch" class="search__text">
         Zuletzt gesuchter Ort:
         <strong>{{ lastSearch }}</strong>
+      </p>
+      <p v-if="currentWeather" class="search__text">
+        <pre>{{ currentWeather }}</pre>
       </p>
     </section>
   </main>
