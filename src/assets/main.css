@@ -7,10 +7,13 @@
   --color-bg: #f9fafb;
   --color-bg-card: #ffffff;
   --color-text: #131926;
-  --color-primary: #0ea5e9;
-  --color-primary-hover: color-mix(in srgb, var(--color-primary) 80%, var(--color-text) 20%);
-  --color-primary-text: var(--color-text);
+  --color-text-muted: color-mix(in srgb, var(--color-text) 60%, transparent);
+  --color-primary: #3a59b7;
   --color-border: color-mix(in srgb, var(--color-text) 10%, transparent);
+  --color-primary-hover: color-mix(in srgb, var(--color-primary) 80%, var(--color-text) 20%);
+  --color-primary-text: var(--color-bg);
+  --color-primary-border: color-mix(in srgb, var(--color-primary-text) 20%, transparent);
+  --color-primary-muted: color-mix(in srgb, var(--color-primary-text) 80%, transparent);
 
   /* Shadow */
   --shadow-sm: 0 1px 2px color-mix(in srgb, var(--color-text) 5%, transparent);
@@ -23,6 +26,10 @@
   --font-size-base: 16px;
   --line-height-base: 1.5;
   --font-size-small: 14px;
+
+  --font-size-h1: 36px;
+  --font-size-h2: 30px;
+  --font-size-h3: 24px;
 
   /* Spacing */
   --space-xs: 0.25rem;
@@ -44,8 +51,7 @@
     --color-bg: #080824;
     --color-bg-card: #0e0e32;
     --color-text: #e5e7eb;
-    --color-primary: #38bdf8;
-    --color-primary-text: var(--color-bg);
+    --color-primary: #389df8;
 
     --shadow-sm: none;
     --shadow-md: none;
@@ -76,6 +82,50 @@ body {
   background: var(--color-bg);
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-headline);
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 600;
+}
+
+h1 {
+  font-size: var(--font-size-h1);
+}
+
+h2 {
+  font-size: var(--font-size-h2);
+}
+
+h3 {
+  font-size: var(--font-size-h3);
+}
+
+h4,
+h5,
+h6 {
+  font-weight: 500;
+}
+
+p,
+ul,
+ol,
+li,
+dl,
+dt,
+dd {
+  margin: 0;
+}
+
 img,
 picture,
 svg {
@@ -87,28 +137,6 @@ a {
   color: inherit;
   text-decoration: underline;
   text-underline-offset: 2px;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-headline);
-  margin-top: 0;
-}
-
-h1,
-h2,
-h3 {
-  font-weight: 600;
-}
-
-h4,
-h5,
-h6 {
-  font-weight: 500;
 }
 
 input,
