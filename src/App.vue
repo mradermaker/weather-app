@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import SearchBar from './components/SearchBar.vue'
+import WeatherCard from './components/WeatherCard.vue'
 import { searchCity, fetchCurrentWeather } from '@/services/weatherApi'
 import type { CurrentWeather } from '@/types/weather'
 
@@ -24,7 +25,6 @@ async function handleSearch(city: string) {
   const location = await searchCity(city)
   if (!location) return
 
-  console.log(location)
   lastSearch.value = city
   localStorage.setItem(STORAGE_KEY, city)
 
@@ -52,9 +52,14 @@ onMounted(() => {
         Zuletzt gesuchter Ort:
         <strong>{{ lastSearch }}</strong>
       </p>
-      <p v-if="currentWeather" class="search__text">
-        <pre>{{ currentWeather }}</pre>
-      </p>
+    </section>
+    <section
+      v-if="currentWeather"
+      class="current-weather section"
+      aria-labelledby="current-weather-title"
+    >
+      <h2 id="current-weather-title" class="current-weather__title">Aktuelles Wetter</h2>
+      <WeatherCard v-if="currentWeather" :weather="currentWeather" :city="lastSearch" />
     </section>
   </main>
   <footer class="footer">

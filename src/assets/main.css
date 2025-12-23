@@ -41,8 +41,8 @@
 /* Dark Mode */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: #111828;
-    --color-bg-card: #172036;
+    --color-bg: #080824;
+    --color-bg-card: #0e0e32;
     --color-text: #e5e7eb;
     --color-primary: #38bdf8;
     --color-primary-text: var(--color-bg);
@@ -158,6 +158,10 @@ button {
   padding-block: var(--space-xxl);
 }
 
+.section + .section {
+  padding-top: 0;
+}
+
 /* ------------------------------
    4. Reusable Blocks
 ---------------------------------*/
@@ -235,6 +239,14 @@ input::placeholder {
 .input:focus-visible {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+/* Card */
+.card {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-lg);
 }
 
 /* ------------------------------
