@@ -2,7 +2,8 @@
 import { ref, onMounted } from 'vue'
 import SearchBar from './components/SearchBar.vue'
 import WeatherCard from './components/WeatherCard.vue'
-import { searchCity, fetchCurrentWeather } from '@/services/weatherApi'
+import ForecastList from './components/ForecastList.vue'
+import { searchCity, fetchCurrentWeather, fetchDailyForecasts } from '@/services/weatherApi'
 import type { CurrentWeather } from '@/types/weather'
 
 const STORAGE_KEY = 'weather-app:last-city' // namespaced to avoid collisions with other apps
@@ -21,6 +22,8 @@ const lastSearch = ref<string>(getInitialCity())
 
 const currentWeather = ref<CurrentWeather | null>(null)
 
+const forecasts = ref<Forecasts | null>(null)
+
 async function handleSearch(city: string) {
   const location = await searchCity(city)
   if (!location) return
@@ -29,6 +32,8 @@ async function handleSearch(city: string) {
   localStorage.setItem(STORAGE_KEY, city)
 
   currentWeather.value = await fetchCurrentWeather(location)
+
+  forecasts.value = await fetchDailyForecasts(location)
 }
 
 // trigger initial search after first render
@@ -53,6 +58,7 @@ onMounted(() => {
         <strong>{{ lastSearch }}</strong>
       </p>
     </section>
+
     <section
       v-if="currentWeather"
       class="current-weather section"
@@ -60,6 +66,13 @@ onMounted(() => {
     >
       <h2 id="current-weather-title" class="current-weather__title">Aktuelles Wetter</h2>
       <WeatherCard v-if="currentWeather" :weather="currentWeather" :city="lastSearch" />
+    </section>
+
+    <section v-if="forecasts" class="forecasts section" aria-labelledby="forecasts-title">
+      <h2 id="forecasts-title" class="forecasts__title">
+        <span class="forecasts__subtitle">7-Tage-Vorhersage für</span> {{ lastSearch }}
+      </h2>
+      <ForecastList v-if="forecasts" :forecasts="forecasts" :city="lastSearch" />
     </section>
   </main>
   <footer class="footer">
@@ -93,6 +106,24 @@ onMounted(() => {
 }
 
 .main {
+}
+
+.search {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.current-weather {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.forecasts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 }
 
 .footer {

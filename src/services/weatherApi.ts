@@ -1,4 +1,4 @@
-import type { GeoLocation, CurrentWeather } from '@/types/weather'
+import type { GeoLocation, CurrentWeather, Forecasts } from '@/types/weather'
 
 const GEOCODING_BASE_URL = 'https://geocoding-api.open-meteo.com/v1/search'
 
@@ -103,4 +103,57 @@ export async function fetchCurrentWeather(location: GeoLocation): Promise<Curren
   }
 
   return weather
+}
+
+// fetch forecast data for a given location
+export async function fetchDailyForecasts(location: GeoLocation): Promise<Forecasts> {
+  // build URL with query params
+  const url = new URL(WEATHER_BASE_URL)
+  url.searchParams.set('latitude', String(location.latitude))
+  url.searchParams.set('longitude', String(location.longitude))
+  url.searchParams.set(
+    'daily',
+    'weather_code,temperature_2m_min,temperature_2m_max,daylight_duration,precipitation_probability_max',
+  )
+  url.searchParams.set('timezone', 'auto')
+
+  // fetch data from api
+  const response = await fetch(url.toString())
+
+  // HTTP error
+  if (!response.ok) {
+    throw new Error('Forecast request failed')
+  }
+
+  console.log(response)
+
+  // parse JSON
+  const data = (await response.json()) as {
+    daily?: {
+      time: string[]
+      weather_code: number[]
+      temperature_2m_min: number[]
+      temperature_2m_max: number[]
+      daylight_duration: number[]
+      precipitation_probability_max: number[]
+    }
+  }
+
+  // error if no results
+  if (!data.daily) {
+    throw new Error('No forecast data')
+  }
+
+  const daily = data.daily
+
+  const forecasts: Forecasts = daily.time.map((date, i) => ({
+    date,
+    weatherCode: daily.weather_code[i],
+    minTemperature: daily.temperature_2m_min[i],
+    maxTemperature: daily.temperature_2m_max[i],
+    daylightDuration: daily.daylight_duration[i],
+    precipitationProbabilityMax: daily.precipitation_probability_max[i],
+  }))
+
+  return forecasts
 }

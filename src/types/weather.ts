@@ -28,3 +28,25 @@ export interface CurrentWeather {
   // Precipitation probability (%)
   precipitationProbability?: number
 }
+
+export interface DailyForecast {
+  // date (YYYY-mm-dd)
+  date: string
+
+  // Open-Meteo weather code
+  weatherCode: number
+
+  // Maximum temperature in °C
+  maxTemperature: number
+
+  // Minimum temperature in °C
+  minTemperature: number
+
+  // Daylight per day in seconds
+  daylightDuration: number
+
+  // Precipitation probability maximum (%)
+  precipitationProbabilityMax: number
+}
+
+export type Forecasts = DailyForecast[]
