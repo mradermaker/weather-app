@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CurrentWeather } from '@/types/weather'
+import { getWeatherDescription } from '@/utils/weatherCode'
 
 // Define props that this component receives from its parent.
 // Example usage: <WeatherCard :weather="currentWeather" :city="lastSearch" />
@@ -15,6 +16,7 @@ const { weather, city } = defineProps<{
       <h3 class="weather-card__title">
         <span class="weather-card__subtitle">Aktuelles Wetter in</span> {{ city }}
       </h3>
+      <p class="weather-card__weather">{{ getWeatherDescription(weather.weatherCode) }}</p>
       <p class="weather-card__temperature">{{ weather.temperature }} °C</p>
     </div>
     <dl class="weather-card__stats">
@@ -60,6 +62,8 @@ const { weather, city } = defineProps<{
   font-size: var(--font-size-base);
   font-family: var(--font-text);
   font-weight: 500;
+}
+.weather-card__weather {
 }
 .weather-card__temperature {
   font-family: var(--font-headline);

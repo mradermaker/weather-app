@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Forecasts } from '@/types/weather'
+import { getWeatherDescription } from '@/utils/weatherCode'
 
 const { forecasts } = defineProps<{
   forecasts: Forecasts
@@ -34,6 +35,7 @@ function formatHour(seconds: number): string {
       {{ formatWeekday(daily.date) }}
       <span class="forecast-card__subtitle">{{ formatDate(daily.date) }}</span>
     </h3>
+    <p class="forecast-card__weather">{{ getWeatherDescription(daily.weatherCode) }}</p>
     <dl class="forecast-card__stats">
       <div class="forecast-card__data">
         <dt class="forecast-card__label">Temperatur von</dt>
@@ -81,6 +83,8 @@ function formatHour(seconds: number): string {
   font-size: var(--font-size-base);
   font-family: var(--font-text);
   font-weight: 300;
+}
+.forecast-card__weather {
 }
 .forecast-card__stats {
   display: grid;
