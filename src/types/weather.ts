@@ -42,8 +42,8 @@ export interface DailyForecast {
   // Minimum temperature in °C
   minTemperature: number
 
-  // Daylight per day in seconds
-  daylightDuration: number
+  // Sunshine per day in seconds
+  sunshineDuration: number
 
   // Precipitation probability maximum (%)
   precipitationProbabilityMax: number

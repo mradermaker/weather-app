@@ -44,8 +44,8 @@ function formatHour(seconds: number): string {
         <dd class="forecast-card__value">{{ daily.maxTemperature }} °C</dd>
       </div>
       <div class="forecast-card__data">
-        <dt class="forecast-card__label">Tageslichtdauer</dt>
-        <dd class="forecast-card__value">{{ formatHour(daily.daylightDuration) }}</dd>
+        <dt class="forecast-card__label">Sonnenscheindauer</dt>
+        <dd class="forecast-card__value">{{ formatHour(daily.sunshineDuration) }}</dd>
       </div>
       <div class="forecast-card__data">
         <dt class="forecast-card__label">Niederschlag</dt>

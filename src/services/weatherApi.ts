@@ -113,7 +113,7 @@ export async function fetchDailyForecasts(location: GeoLocation): Promise<Foreca
   url.searchParams.set('longitude', String(location.longitude))
   url.searchParams.set(
     'daily',
-    'weather_code,temperature_2m_min,temperature_2m_max,daylight_duration,precipitation_probability_max',
+    'weather_code,temperature_2m_min,temperature_2m_max,sunshine_duration,precipitation_probability_max',
   )
   url.searchParams.set('timezone', 'auto')
 
@@ -134,7 +134,7 @@ export async function fetchDailyForecasts(location: GeoLocation): Promise<Foreca
       weather_code: number[]
       temperature_2m_min: number[]
       temperature_2m_max: number[]
-      daylight_duration: number[]
+      sunshine_duration: number[]
       precipitation_probability_max: number[]
     }
   }
@@ -151,7 +151,7 @@ export async function fetchDailyForecasts(location: GeoLocation): Promise<Foreca
     weatherCode: daily.weather_code[i],
     minTemperature: daily.temperature_2m_min[i],
     maxTemperature: daily.temperature_2m_max[i],
-    daylightDuration: daily.daylight_duration[i],
+    sunshineDuration: daily.sunshine_duration[i],
     precipitationProbabilityMax: daily.precipitation_probability_max[i],
   }))
 
