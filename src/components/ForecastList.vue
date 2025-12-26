@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Forecasts } from '@/types/weather'
-import { getWeatherDescription } from '@/utils/weatherCode'
+import { getWeatherLabel, getWeatherIcon } from '@/utils/weatherCode'
+import WeatherIcon from './WeatherIcon.vue'
 
 const { forecasts } = defineProps<{
   forecasts: Forecasts
@@ -31,11 +32,17 @@ function formatHour(seconds: number): string {
 
 <template>
   <article v-for="daily in forecasts" class="forecast-card card">
-    <h3 class="forecast-card__title">
-      {{ formatWeekday(daily.date) }}
-      <span class="forecast-card__subtitle">{{ formatDate(daily.date) }}</span>
-    </h3>
-    <p class="forecast-card__weather">{{ getWeatherDescription(daily.weatherCode) }}</p>
+    <div class="forecast-card__header">
+      <h3 class="forecast-card__title">
+        {{ formatWeekday(daily.date) }}
+        <span class="forecast-card__subtitle">{{ formatDate(daily.date) }}</span>
+      </h3>
+      <WeatherIcon
+        :icon="getWeatherIcon(daily.weatherCode)"
+        :label="getWeatherLabel(daily.weatherCode)"
+        class="forecast-card__weather"
+      />
+    </div>
     <dl class="forecast-card__stats">
       <div class="forecast-card__data">
         <dt class="forecast-card__label">Temperatur von</dt>
@@ -64,11 +71,23 @@ function formatHour(seconds: number): string {
   flex-direction: column;
   gap: var(--space-md);
 }
-@media (min-width: 1200px) {
+@media (min-width: 768px) {
   .forecast-card {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+  }
+}
+.forecast-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  flex: 1;
+}
+@media (min-width: 768px) {
+  .forecast-card__header {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 .forecast-card__title {
@@ -77,7 +96,6 @@ function formatHour(seconds: number): string {
   gap: var(--space-sm);
   font-size: var(--font-size-h3);
   line-height: 1.2;
-  flex: 1;
 }
 .forecast-card__subtitle {
   font-size: var(--font-size-base);
@@ -86,14 +104,19 @@ function formatHour(seconds: number): string {
 }
 .forecast-card__weather {
 }
+@media (min-width: 768px) {
+  .forecast-card__weather {
+    justify-self: center;
+  }
+}
 .forecast-card__stats {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-sm);
 }
-@media (min-width: 1200px) {
+@media (min-width: 768px) {
   .forecast-card__stats {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, auto));
   }
 }
 .forecast-card__data {

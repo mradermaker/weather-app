@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { CurrentWeather } from '@/types/weather'
-import { getWeatherDescription } from '@/utils/weatherCode'
+import { getWeatherLabel, getWeatherIcon } from '@/utils/weatherCode'
+import WeatherIcon from './WeatherIcon.vue'
 
 // Define props that this component receives from its parent.
 // Example usage: <WeatherCard :weather="currentWeather" :city="lastSearch" />
@@ -12,11 +13,16 @@ const { weather, city } = defineProps<{
 
 <template>
   <article class="weather-card card">
-    <div class="weather-card__info">
+    <div class="weather-card__header">
       <h3 class="weather-card__title">
         <span class="weather-card__subtitle">Aktuelles Wetter in</span> {{ city }}
       </h3>
-      <p class="weather-card__weather">{{ getWeatherDescription(weather.weatherCode) }}</p>
+      <WeatherIcon
+        :icon="getWeatherIcon(weather.weatherCode)"
+        :label="getWeatherLabel(weather.weatherCode)"
+        class="weather-card__weather"
+        size="lg"
+      />
       <p class="weather-card__temperature">{{ weather.temperature }} °C</p>
     </div>
     <dl class="weather-card__stats">
@@ -44,11 +50,19 @@ const { weather, city } = defineProps<{
   flex-direction: column;
   gap: var(--space-md);
 }
-.weather-card__info {
+.weather-card__header {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-md);
+  text-align: center;
+}
+@media (min-width: 768px) {
+  .weather-card__header {
+    flex-direction: row;
+    text-align: left;
+  }
 }
 .weather-card__title {
   display: flex;
