@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Forecasts } from '@/types/weather'
+import type { DailyForecasts } from '@/types/weather'
 import { getWeatherLabel, getWeatherIcon } from '@/utils/weatherCode'
 import WeatherIcon from './WeatherIcon.vue'
 
-const { forecasts } = defineProps<{
-  forecasts: Forecasts
+const { dailyForecasts } = defineProps<{
+  dailyForecasts: DailyForecasts
 }>()
 
 function formatWeekday(date: string): string {
@@ -31,106 +31,106 @@ function formatHour(seconds: number): string {
 </script>
 
 <template>
-  <article v-for="daily in forecasts" class="forecast-card card">
-    <div class="forecast-card__header">
-      <h3 class="forecast-card__title">
+  <article v-for="daily in dailyForecasts" class="daily-forecast-card card">
+    <div class="daily-forecast-card__header">
+      <h3 class="daily-forecast-card__title">
         {{ formatWeekday(daily.date) }}
-        <span class="forecast-card__subtitle">{{ formatDate(daily.date) }}</span>
+        <span class="daily-forecast-card__subtitle">{{ formatDate(daily.date) }}</span>
       </h3>
       <WeatherIcon
         :icon="getWeatherIcon(daily.weatherCode)"
         :label="getWeatherLabel(daily.weatherCode)"
-        class="forecast-card__weather"
+        class="daily-forecast-card__weather"
       />
     </div>
-    <dl class="forecast-card__stats">
-      <div class="forecast-card__data">
-        <dt class="forecast-card__label">Temperatur von</dt>
-        <dd class="forecast-card__value">{{ daily.minTemperature }} °C</dd>
+    <dl class="daily-forecast-card__stats">
+      <div class="daily-forecast-card__data">
+        <dt class="daily-forecast-card__label">Temperatur von</dt>
+        <dd class="daily-forecast-card__value">{{ daily.minTemperature }} °C</dd>
       </div>
-      <div class="forecast-card__data">
-        <dt class="forecast-card__label">Temperatur bis</dt>
-        <dd class="forecast-card__value">{{ daily.maxTemperature }} °C</dd>
+      <div class="daily-forecast-card__data">
+        <dt class="daily-forecast-card__label">Temperatur bis</dt>
+        <dd class="daily-forecast-card__value">{{ daily.maxTemperature }} °C</dd>
       </div>
-      <div class="forecast-card__data">
-        <dt class="forecast-card__label">Sonnenscheindauer</dt>
-        <dd class="forecast-card__value">{{ formatHour(daily.sunshineDuration) }}</dd>
+      <div class="daily-forecast-card__data">
+        <dt class="daily-forecast-card__label">Sonnenscheindauer</dt>
+        <dd class="daily-forecast-card__value">{{ formatHour(daily.sunshineDuration) }}</dd>
       </div>
-      <div class="forecast-card__data">
-        <dt class="forecast-card__label">Niederschlag</dt>
-        <dd class="forecast-card__value">{{ daily.precipitationProbabilityMax }} %</dd>
+      <div class="daily-forecast-card__data">
+        <dt class="daily-forecast-card__label">Niederschlag</dt>
+        <dd class="daily-forecast-card__value">{{ daily.precipitationProbabilityMax }} %</dd>
       </div>
     </dl>
   </article>
 </template>
 
 <style scoped>
-.forecast-card {
+.daily-forecast-card {
   padding: var(--space-md);
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
 }
 @media (min-width: 768px) {
-  .forecast-card {
+  .daily-forecast-card {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
   }
 }
-.forecast-card__header {
+.daily-forecast-card__header {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
   flex: 1;
 }
 @media (min-width: 768px) {
-  .forecast-card__header {
+  .daily-forecast-card__header {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-.forecast-card__title {
+.daily-forecast-card__title {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
   font-size: var(--font-size-h3);
   line-height: 1.2;
 }
-.forecast-card__subtitle {
+.daily-forecast-card__subtitle {
   font-size: var(--font-size-base);
   font-family: var(--font-text);
   font-weight: 300;
 }
-.forecast-card__weather {
+.daily-forecast-card__weather {
 }
 @media (min-width: 768px) {
-  .forecast-card__weather {
+  .daily-forecast-card__weather {
     justify-self: center;
   }
 }
-.forecast-card__stats {
+.daily-forecast-card__stats {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-sm);
 }
 @media (min-width: 768px) {
-  .forecast-card__stats {
+  .daily-forecast-card__stats {
     grid-template-columns: repeat(4, minmax(0, auto));
   }
 }
-.forecast-card__data {
+.daily-forecast-card__data {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
   align-items: flex-start;
 }
-.forecast-card__label {
+.daily-forecast-card__label {
   font-size: var(--font-size-small);
   color: var(--color-text-muted);
   hyphens: auto;
 }
-.forecast-card__value {
+.daily-forecast-card__value {
   font-family: var(--font-text);
   font-weight: 500;
 }

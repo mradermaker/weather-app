@@ -1,4 +1,4 @@
-import type { GeoLocation, CurrentWeather, Forecasts } from '@/types/weather'
+import type { GeoLocation, CurrentWeather, DailyForecasts } from '@/types/weather'
 
 const GEOCODING_BASE_URL = 'https://geocoding-api.open-meteo.com/v1/search'
 
@@ -105,8 +105,8 @@ export async function fetchCurrentWeather(location: GeoLocation): Promise<Curren
   return weather
 }
 
-// fetch forecast data for a given location
-export async function fetchDailyForecasts(location: GeoLocation): Promise<Forecasts> {
+// fetch daily forecast data for a given location
+export async function fetchDailyForecasts(location: GeoLocation): Promise<DailyForecasts> {
   // build URL with query params
   const url = new URL(WEATHER_BASE_URL)
   url.searchParams.set('latitude', String(location.latitude))
@@ -122,7 +122,7 @@ export async function fetchDailyForecasts(location: GeoLocation): Promise<Foreca
 
   // HTTP error
   if (!response.ok) {
-    throw new Error('Forecast request failed')
+    throw new Error('Daily forecast request failed')
   }
 
   console.log(response)
@@ -141,12 +141,12 @@ export async function fetchDailyForecasts(location: GeoLocation): Promise<Foreca
 
   // error if no results
   if (!data.daily) {
-    throw new Error('No forecast data')
+    throw new Error('No daily forecast data')
   }
 
   const daily = data.daily
 
-  const forecasts: Forecasts = daily.time.map((date, i) => ({
+  const dailyForecasts: DailyForecasts = daily.time.map((date, i) => ({
     date,
     weatherCode: daily.weather_code[i],
     minTemperature: daily.temperature_2m_min[i],
@@ -155,5 +155,5 @@ export async function fetchDailyForecasts(location: GeoLocation): Promise<Foreca
     precipitationProbabilityMax: daily.precipitation_probability_max[i],
   }))
 
-  return forecasts
+  return dailyForecasts
 }

@@ -2,9 +2,9 @@
 import { ref, onMounted } from 'vue'
 import SearchBar from './components/SearchBar.vue'
 import WeatherCard from './components/WeatherCard.vue'
-import ForecastList from './components/ForecastList.vue'
+import DailyForecastList from './components/DailyForecastList.vue'
 import { searchCity, fetchCurrentWeather, fetchDailyForecasts } from '@/services/weatherApi'
-import type { CurrentWeather } from '@/types/weather'
+import type { CurrentWeather, DailyForecasts } from '@/types/weather'
 
 const STORAGE_KEY = 'weather-app:last-city' // namespaced to avoid collisions with other apps
 const DEFAULT_CITY = 'Berlin'
@@ -22,7 +22,7 @@ const lastSearch = ref<string>(getInitialCity())
 
 const currentWeather = ref<CurrentWeather | null>(null)
 
-const forecasts = ref<Forecasts | null>(null)
+const dailyForecasts = ref<DailyForecasts | null>(null)
 
 async function handleSearch(city: string) {
   const location = await searchCity(city)
@@ -33,7 +33,7 @@ async function handleSearch(city: string) {
 
   currentWeather.value = await fetchCurrentWeather(location)
 
-  forecasts.value = await fetchDailyForecasts(location)
+  dailyForecasts.value = await fetchDailyForecasts(location)
 }
 
 // trigger initial search after first render
@@ -68,11 +68,19 @@ onMounted(() => {
       <WeatherCard v-if="currentWeather" :weather="currentWeather" :city="lastSearch" />
     </section>
 
-    <section v-if="forecasts" class="forecasts section" aria-labelledby="forecasts-title">
-      <h2 id="forecasts-title" class="forecasts__title">
-        <span class="forecasts__subtitle">7-Tage-Vorhersage für</span> {{ lastSearch }}
+    <section
+      v-if="dailyForecasts"
+      class="daily-forecasts section"
+      aria-labelledby="daily-forecasts-title"
+    >
+      <h2 id="daily-forecasts-title" class="daily-forecasts__title">
+        <span class="daily-forecasts__subtitle">7-Tage-Vorhersage für</span> {{ lastSearch }}
       </h2>
-      <ForecastList v-if="forecasts" :forecasts="forecasts" :city="lastSearch" />
+      <DailyForecastList
+        v-if="dailyForecasts"
+        :dailyForecasts="dailyForecasts"
+        :city="lastSearch"
+      />
     </section>
   </main>
   <footer class="footer">
@@ -120,7 +128,7 @@ onMounted(() => {
   gap: var(--space-md);
 }
 
-.forecasts {
+.daily-forecasts {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);

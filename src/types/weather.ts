@@ -49,4 +49,4 @@ export interface DailyForecast {
   precipitationProbabilityMax: number
 }
 
-export type Forecasts = DailyForecast[]
+export type DailyForecasts = DailyForecast[]
