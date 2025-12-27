@@ -30,7 +30,7 @@ export interface CurrentWeather {
 }
 
 export interface DailyForecast {
-  // date (YYYY-mm-dd)
+  // date (yyyy-mm-dd)
   date: string
 
   // Open-Meteo weather code
@@ -50,3 +50,19 @@ export interface DailyForecast {
 }
 
 export type DailyForecasts = DailyForecast[]
+
+export interface HourlyForecast {
+  // date (yyyy-mm-ddThh:mm)
+  date: string
+
+  // Open-Meteo weather code
+  weatherCode: number
+
+  // Temperature in °C
+  temperature: number
+
+  // Precipitation probability (%)
+  precipitationProbability: number
+}
+
+export type HourlyForecasts = HourlyForecast[]

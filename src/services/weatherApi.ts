@@ -1,4 +1,4 @@
-import type { GeoLocation, CurrentWeather, DailyForecasts } from '@/types/weather'
+import type { GeoLocation, CurrentWeather, DailyForecasts, HourlyForecasts } from '@/types/weather'
 
 const GEOCODING_BASE_URL = 'https://geocoding-api.open-meteo.com/v1/search'
 
@@ -125,8 +125,6 @@ export async function fetchDailyForecasts(location: GeoLocation): Promise<DailyF
     throw new Error('Daily forecast request failed')
   }
 
-  console.log(response)
-
   // parse JSON
   const data = (await response.json()) as {
     daily?: {
@@ -156,4 +154,56 @@ export async function fetchDailyForecasts(location: GeoLocation): Promise<DailyF
   }))
 
   return dailyForecasts
+}
+
+// fetch hourly forecast data for a given location
+export async function fetchHourlyForecasts(location: GeoLocation): Promise<HourlyForecasts> {
+  // build URL with query params
+  const url = new URL(WEATHER_BASE_URL)
+  url.searchParams.set('latitude', String(location.latitude))
+  url.searchParams.set('longitude', String(location.longitude))
+  url.searchParams.set('hourly', 'weather_code,temperature_2m,precipitation_probability')
+  url.searchParams.set('timezone', 'auto')
+
+  // fetch data from api
+  const response = await fetch(url.toString())
+
+  // HTTP error
+  if (!response.ok) {
+    throw new Error('Hourly forecast request failed')
+  }
+
+  // parse JSON
+  const data = (await response.json()) as {
+    hourly?: {
+      time: string[]
+      weather_code: number[]
+      temperature_2m: number[]
+      precipitation_probability: number[]
+    }
+  }
+
+  // error if no results
+  if (!data.hourly) {
+    throw new Error('No hourly forecast data')
+  }
+
+  const hourly = data.hourly
+
+  let hourlyForecasts: HourlyForecasts = hourly.time.map((date, i) => ({
+    date,
+    weatherCode: hourly.weather_code[i],
+    temperature: hourly.temperature_2m[i],
+    precipitationProbability: hourly.precipitation_probability[i],
+  }))
+
+  const now = new Date()
+
+  hourlyForecasts = hourlyForecasts.filter((entry) => {
+    return new Date(entry.date) >= now
+  })
+
+  hourlyForecasts = hourlyForecasts.slice(0, 6)
+
+  return hourlyForecasts
 }

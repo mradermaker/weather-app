@@ -3,8 +3,14 @@ import { ref, onMounted } from 'vue'
 import SearchBar from './components/SearchBar.vue'
 import WeatherCard from './components/WeatherCard.vue'
 import DailyForecastList from './components/DailyForecastList.vue'
-import { searchCity, fetchCurrentWeather, fetchDailyForecasts } from '@/services/weatherApi'
-import type { CurrentWeather, DailyForecasts } from '@/types/weather'
+import HourlyForecastList from './components/HourlyForecastList.vue'
+import {
+  searchCity,
+  fetchCurrentWeather,
+  fetchDailyForecasts,
+  fetchHourlyForecasts,
+} from '@/services/weatherApi'
+import type { CurrentWeather, DailyForecasts, HourlyForecasts } from '@/types/weather'
 
 const STORAGE_KEY = 'weather-app:last-city' // namespaced to avoid collisions with other apps
 const DEFAULT_CITY = 'Berlin'
@@ -24,6 +30,8 @@ const currentWeather = ref<CurrentWeather | null>(null)
 
 const dailyForecasts = ref<DailyForecasts | null>(null)
 
+const hourlyForecasts = ref<HourlyForecasts | null>(null)
+
 async function handleSearch(city: string) {
   const location = await searchCity(city)
   if (!location) return
@@ -34,6 +42,8 @@ async function handleSearch(city: string) {
   currentWeather.value = await fetchCurrentWeather(location)
 
   dailyForecasts.value = await fetchDailyForecasts(location)
+
+  hourlyForecasts.value = await fetchHourlyForecasts(location)
 }
 
 // trigger initial search after first render
@@ -43,6 +53,32 @@ onMounted(() => {
 </script>
 
 <template>
+  <svg style="display: none" aria-hidden="true">
+    <symbol
+      id="icon-temperature"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z" />
+    </symbol>
+    <symbol
+      id="icon-precipitation"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M12 13v7a2 2 0 0 0 4 0" />
+      <path d="M12 2v2" />
+      <path d="M20.992 13a1 1 0 0 0 .97-1.274 10.284 10.284 0 0 0-19.923 0A1 1 0 0 0 3 13z" />
+    </symbol>
+  </svg>
   <header class="header">
     <div class="header__inner container">
       <h1 class="header__title">Weather App</h1>
@@ -66,6 +102,21 @@ onMounted(() => {
     >
       <h2 id="current-weather-title" class="current-weather__title">Aktuelles Wetter</h2>
       <WeatherCard v-if="currentWeather" :weather="currentWeather" :city="lastSearch" />
+    </section>
+
+    <section
+      v-if="hourlyForecasts"
+      class="hourly-forecasts section"
+      aria-labelledby="hourly-forecasts-title"
+    >
+      <h2 id="hourly-forecasts-title" class="hourly-forecasts__title">Stündliche Vorhersage</h2>
+      <div v-if="hourlyForecasts" class="hourly-forecasts__cards">
+        <HourlyForecastList
+          v-if="hourlyForecasts"
+          :hourlyForecasts="hourlyForecasts"
+          :city="lastSearch"
+        />
+      </div>
     </section>
 
     <section
@@ -132,6 +183,33 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
+}
+.daily-forecasts__title {
+}
+.daily-forecasts__subtitle {
+}
+
+.hourly-forecasts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.hourly-forecasts__title {
+}
+.hourly-forecasts__cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+@media (min-width: 768px) {
+  .hourly-forecasts__cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1200px) {
+  .hourly-forecasts__cards {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
 }
 
 .footer {
