@@ -16,7 +16,7 @@ function formatTime(date: string): string {
 </script>
 
 <template>
-  <article v-for="hourly in hourlyForecasts" class="hourly-forecast-card card">
+  <article v-for="hourly in hourlyForecasts" :key="hourly.date" class="hourly-forecast-card card">
     <h3 class="hourly-forecast-card__time">{{ formatTime(hourly.date) }}</h3>
     <WeatherIcon
       :icon="getWeatherIcon(hourly.weatherCode)"

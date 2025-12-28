@@ -31,7 +31,7 @@ function formatHour(seconds: number): string {
 </script>
 
 <template>
-  <article v-for="daily in dailyForecasts" class="daily-forecast-card card">
+  <article v-for="daily in dailyForecasts" :key="daily.date" class="daily-forecast-card card">
     <h3 class="daily-forecast-card__title">
       {{ formatWeekday(daily.date) }}
       <span class="daily-forecast-card__subtitle">{{ formatDate(daily.date) }}</span>
