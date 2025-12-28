@@ -54,7 +54,7 @@ async function handleSearch(city: string) {
     currentWeather.value = await fetchCurrentWeather(location)
     dailyForecasts.value = await fetchDailyForecasts(location)
     hourlyForecasts.value = await fetchHourlyForecasts(location)
-  } catch (error) {
+  } catch {
     errorMessage.value = 'Daten konnten nicht geladen werden'
   } finally {
     isLoading.value = false
