@@ -32,26 +32,23 @@ function formatHour(seconds: number): string {
 
 <template>
   <article v-for="daily in dailyForecasts" class="daily-forecast-card card">
+    <h3 class="daily-forecast-card__title">
+      {{ formatWeekday(daily.date) }}
+      <span class="daily-forecast-card__subtitle">{{ formatDate(daily.date) }}</span>
+    </h3>
     <div class="daily-forecast-card__header">
-      <h3 class="daily-forecast-card__title">
-        {{ formatWeekday(daily.date) }}
-        <span class="daily-forecast-card__subtitle">{{ formatDate(daily.date) }}</span>
-      </h3>
       <WeatherIcon
         :icon="getWeatherIcon(daily.weatherCode)"
         :label="getWeatherLabel(daily.weatherCode)"
         class="daily-forecast-card__weather"
       />
+      {{ getWeatherLabel(daily.weatherCode) }}
+    </div>
+    <div class="daily-forecast-card__temperature">
+      <p class="daily-forecast-card__temperature-max">{{ daily.maxTemperature }} °C</p>
+      <p class="daily-forecast-card__temperature-min">{{ daily.minTemperature }} °C</p>
     </div>
     <dl class="daily-forecast-card__stats">
-      <div class="daily-forecast-card__data">
-        <dt class="daily-forecast-card__label">Temperatur von</dt>
-        <dd class="daily-forecast-card__value">{{ daily.minTemperature }} °C</dd>
-      </div>
-      <div class="daily-forecast-card__data">
-        <dt class="daily-forecast-card__label">Temperatur bis</dt>
-        <dd class="daily-forecast-card__value">{{ daily.maxTemperature }} °C</dd>
-      </div>
       <div class="daily-forecast-card__data">
         <dt class="daily-forecast-card__label">Sonnenscheindauer</dt>
         <dd class="daily-forecast-card__value">{{ formatHour(daily.sunshineDuration) }}</dd>
@@ -108,6 +105,15 @@ function formatHour(seconds: number): string {
   .daily-forecast-card__weather {
     justify-self: center;
   }
+}
+.daily-forecast-card__temperature {
+  display: flex;
+  gap: var(--space-sm);
+}
+.daily-forecast-card__temperature-max {
+}
+.daily-forecast-card__temperature-min {
+  color: var(--color-text-muted);
 }
 .daily-forecast-card__stats {
   display: grid;

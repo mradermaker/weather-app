@@ -7,11 +7,19 @@ const emit = defineEmits<{
   (e: 'search', value: string): void
 }>()
 
+// Define props that this component receives from its parent.
+// Example usage: <SearchBar :disabled="isLoading" @search="handleSearch" />
+const { disabled } = defineProps<{
+  disabled?: boolean
+}>()
+
 // Local state for the input field (reactive)
 const city = ref('')
 
 // Called when the form is submitted
 function handleSubmit() {
+  if (disabled) return
+
   const trimmed = city.value.trim()
   if (!trimmed) return
 
@@ -22,7 +30,7 @@ function handleSubmit() {
 <template>
   <form class="search-bar" @submit.prevent="handleSubmit">
     <div class="search-bar__field field">
-      <label class="field__label" for="search-bar-city"> Stadt oder Ort </label>
+      <label class="field__label" for="search-bar-city">Stadt oder Ort</label>
 
       <div class="search-bar__controls field__control">
         <input
@@ -33,9 +41,10 @@ function handleSubmit() {
           name="city"
           placeholder="z.B. Berlin, Hamburg, München"
           autocomplete="off"
+          :disabled="disabled"
         />
 
-        <button type="submit" class="button search-bar__button">Suchen</button>
+        <button type="submit" class="button search-bar__button" :disabled="disabled">Suchen</button>
       </div>
     </div>
   </form>

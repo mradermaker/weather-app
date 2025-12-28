@@ -4,6 +4,7 @@ import SearchBar from './components/SearchBar.vue'
 import WeatherCard from './components/WeatherCard.vue'
 import DailyForecastList from './components/DailyForecastList.vue'
 import HourlyForecastList from './components/HourlyForecastList.vue'
+import StateMessage from './components/StateMessage.vue'
 import {
   searchCity,
   fetchCurrentWeather,
@@ -32,18 +33,32 @@ const dailyForecasts = ref<DailyForecasts | null>(null)
 
 const hourlyForecasts = ref<HourlyForecasts | null>(null)
 
+const isLoading = ref(false)
+
+const errorMessage = ref<string | null>(null)
+
 async function handleSearch(city: string) {
-  const location = await searchCity(city)
-  if (!location) return
+  errorMessage.value = null
+  isLoading.value = true
 
-  lastSearch.value = city
-  localStorage.setItem(STORAGE_KEY, city)
+  try {
+    const location = await searchCity(city)
+    if (!location) {
+      errorMessage.value = 'Ort nicht gefunden'
+      return
+    }
 
-  currentWeather.value = await fetchCurrentWeather(location)
+    lastSearch.value = city
+    localStorage.setItem(STORAGE_KEY, city)
 
-  dailyForecasts.value = await fetchDailyForecasts(location)
-
-  hourlyForecasts.value = await fetchHourlyForecasts(location)
+    currentWeather.value = await fetchCurrentWeather(location)
+    dailyForecasts.value = await fetchDailyForecasts(location)
+    hourlyForecasts.value = await fetchHourlyForecasts(location)
+  } catch (error) {
+    errorMessage.value = 'Daten konnten nicht geladen werden'
+  } finally {
+    isLoading.value = false
+  }
 }
 
 // trigger initial search after first render
@@ -88,7 +103,8 @@ onMounted(() => {
   <main id="main-content" class="main container">
     <section class="search section" aria-labelledby="search-title">
       <h2 id="search-title" class="search__title">Ort suchen</h2>
-      <SearchBar @search="handleSearch" />
+      <SearchBar :disabled="isLoading" @search="handleSearch" />
+      <StateMessage :message="errorMessage" :loading="isLoading" />
       <p v-if="lastSearch" class="search__text">
         Zuletzt gesuchter Ort:
         <strong>{{ lastSearch }}</strong>
