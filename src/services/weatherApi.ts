@@ -64,6 +64,11 @@ export async function fetchCurrentWeather(location: GeoLocation): Promise<Curren
     'current',
     'weather_code,temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,is_day',
   )
+  url.searchParams.set('forecast_days', '1')
+  url.searchParams.set(
+    'daily',
+    'precipitation_probability_max,temperature_2m_max,temperature_2m_min',
+  )
   url.searchParams.set('timezone', 'auto')
 
   // fetch data from api
@@ -84,6 +89,11 @@ export async function fetchCurrentWeather(location: GeoLocation): Promise<Curren
       wind_speed_10m: number
       is_day: 0 | 1
     }
+    daily?: {
+      precipitation_probability_max: number[]
+      temperature_2m_max: number[]
+      temperature_2m_min: number[]
+    }
   }
 
   // error if no results
@@ -100,6 +110,9 @@ export async function fetchCurrentWeather(location: GeoLocation): Promise<Curren
     humidity: current.relative_humidity_2m,
     windSpeed: current.wind_speed_10m,
     isDay: current.is_day === 1,
+    precipitationProbabilityMax: data.daily?.precipitation_probability_max?.[0],
+    maxTemperature: data.daily?.temperature_2m_max?.[0],
+    minTemperature: data.daily?.temperature_2m_min?.[0],
   }
 
   return weather

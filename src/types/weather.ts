@@ -25,8 +25,14 @@ export interface CurrentWeather {
   // True if it is currently day, false if night
   isDay: boolean
 
-  // Precipitation probability (%)
-  precipitationProbability?: number
+  // Precipitation probability maximum (%)
+  precipitationProbabilityMax?: number
+
+  // Maximum temperature in °C
+  maxTemperature?: number
+
+  // Minimum temperature in °C
+  minTemperature?: number
 }
 
 export interface DailyForecast {

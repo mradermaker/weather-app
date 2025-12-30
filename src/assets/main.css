@@ -8,12 +8,22 @@
   --color-bg-card: #ffffff;
   --color-text: #131926;
   --color-text-muted: color-mix(in srgb, var(--color-text) 60%, transparent);
-  --color-primary: #3a59b7;
   --color-border: color-mix(in srgb, var(--color-text) 10%, transparent);
-  --color-primary-hover: color-mix(in srgb, var(--color-primary) 80%, var(--color-text) 20%);
-  --color-primary-text: var(--color-bg);
-  --color-primary-border: color-mix(in srgb, var(--color-primary-text) 20%, transparent);
-  --color-primary-muted: color-mix(in srgb, var(--color-primary-text) 80%, transparent);
+
+  --color-primary: #2563eb;
+  --color-primary-text: #ffffff;
+  --color-primary-hover: color-mix(
+    in srgb,
+    var(--color-primary) 80%,
+    var(--color-primary-text) 20%
+  );
+
+  --weather-primary: #2563eb;
+  --weather-secondary: #0579d1;
+  --weather-text: #ffffff;
+  --weather-card: color-mix(in srgb, var(--color-text) 20%, transparent);
+  --weather-border: var(--weather-card);
+  --weather-text-muted: color-mix(in srgb, var(--weather-text) 80%, transparent);
 
   --color-error: #b90606;
   --color-success: #007033;
@@ -26,7 +36,7 @@
   --font-headline: 'Albert Sans', system-ui, sans-serif;
   --font-text: 'Inter', system-ui, sans-serif;
 
-  --font-size-base: 16px;
+  --font-size-base: 18px;
   --line-height-base: 1.5;
   --font-size-small: 14px;
 
@@ -54,7 +64,11 @@
     --color-bg: #080824;
     --color-bg-card: #0e0e32;
     --color-text: #e5e7eb;
-    --color-primary: #389df8;
+
+    --color-primary: #38a6fa;
+    --color-primary-text: #080824;
+
+    --weather-card: color-mix(in srgb, var(--color-bg) 20%, transparent);
 
     --color-error: #fcabab;
     --color-success: #b1fcac;
@@ -62,6 +76,11 @@
     --shadow-sm: none;
     --shadow-md: none;
   }
+}
+
+.--night {
+  --weather-primary: #1e1b4b;
+  --weather-secondary: #1e2876;
 }
 
 /* ------------------------------
@@ -130,6 +149,11 @@ dl,
 dt,
 dd {
   margin: 0;
+}
+
+strong,
+b {
+  font-weight: 500;
 }
 
 img,
@@ -212,7 +236,6 @@ button {
   background: var(--color-primary);
   color: var(--color-primary-text);
   font-weight: 500;
-  font-size: 0.95rem;
   text-decoration: none;
   box-shadow: var(--shadow-sm);
   white-space: nowrap;
@@ -231,7 +254,7 @@ button {
 }
 
 .button:focus-visible {
-  outline: 2px solid var(--color-primary-hover);
+  outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
 
@@ -272,7 +295,7 @@ input::placeholder {
 
 .input:focus-visible {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 1px var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary);
 }
 
 /* Icon */
@@ -280,7 +303,6 @@ input::placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text);
 }
 .icon--xs {
   width: 1rem;
@@ -304,7 +326,21 @@ input::placeholder {
   background: var(--color-bg-card);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
-  padding: var(--space-lg);
+  padding: var(--space-md);
+}
+@media (min-width: 1200px) {
+  .card {
+    padding: var(--space-lg);
+  }
+}
+.card--small {
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+}
+@media (min-width: 1200px) {
+  .card--small {
+    padding: var(--space-md);
+  }
 }
 
 /* ------------------------------

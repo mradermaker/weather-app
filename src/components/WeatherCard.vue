@@ -9,34 +9,86 @@ const { weather, city } = defineProps<{
   weather: CurrentWeather
   city: string
 }>()
+
+const today = new Date()
+
+const formattedToday = today.toLocaleDateString('de-DE', {
+  weekday: 'long',
+  day: '2-digit',
+  month: 'long',
+})
+
+const isoDate = today.toISOString().split('T')[0]
 </script>
 
 <template>
-  <article class="weather-card card">
+  <article class="weather-card">
     <div class="weather-card__header">
-      <h3 class="weather-card__title">
-        <span class="weather-card__subtitle">Aktuelles Wetter in</span> {{ city }}
-      </h3>
-      <WeatherIcon
-        :icon="getWeatherIcon(weather.weatherCode)"
-        :label="getWeatherLabel(weather.weatherCode)"
-        class="weather-card__weather"
-        size="lg"
-      />
-      <p class="weather-card__temperature">{{ weather.temperature }} °C</p>
+      <h3 class="weather-card__title">{{ city }}</h3>
+      <time :datetime="isoDate" class="weather-date">
+        {{ formattedToday }}
+      </time>
     </div>
-    <dl class="weather-card__stats">
+    <WeatherIcon
+      :icon="getWeatherIcon(weather.weatherCode)"
+      :label="getWeatherLabel(weather.weatherCode)"
+      class="weather-card__icon"
+      size="lg"
+    />
+    <p class="weather-card__temperature">{{ weather.temperature }} °C</p>
+    <div class="weather-card__infos">
+      <p class="weather-card__weather">{{ getWeatherLabel(weather.weatherCode) }}°</p>
+      <p class="weather-card__precipitation-temperature">
+        H: <strong>{{ weather.maxTemperature }} °C</strong>, T:
+        <strong>{{ weather.minTemperature }} °C</strong>
+      </p>
+    </div>
+    <dl class="weather-card__stats card card--small">
       <div class="weather-card__data">
+        <dt class="weather-card__icon">
+          <svg
+            class="icon icon--sm icon--temperature"
+            role="img"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <use href="#icon-temperature" />
+          </svg>
+        </dt>
         <dt class="weather-card__label">Gefühlte Temperatur</dt>
-        <dd class="weather-card__value">{{ weather.apparentTemperature }} °C</dd>
+        <dd class="weather-card__value">{{ weather.apparentTemperature }}°</dd>
       </div>
       <div class="weather-card__data">
+        <dt class="weather-card__icon">
+          <svg class="icon icon--sm icon--humidity" role="img" aria-hidden="true" focusable="false">
+            <use href="#icon-humidity" />
+          </svg>
+        </dt>
         <dt class="weather-card__label">Luftfeuchtigkeit</dt>
         <dd class="weather-card__value">{{ weather.humidity }} %</dd>
       </div>
       <div class="weather-card__data">
+        <dt class="weather-card__icon">
+          <svg class="icon icon--sm icon--wind" role="img" aria-hidden="true" focusable="false">
+            <use href="#icon-wind" />
+          </svg>
+        </dt>
         <dt class="weather-card__label">Windgeschwindigkeit</dt>
         <dd class="weather-card__value">{{ weather.windSpeed }} km/h</dd>
+      </div>
+      <div class="weather-card__data">
+        <dt class="weather-card__icon">
+          <svg
+            class="icon icon--sm icon--precipitation"
+            role="img"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <use href="#icon-precipitation" />
+          </svg>
+        </dt>
+        <dt class="weather-card__label">Niederschlag</dt>
+        <dd class="weather-card__value">{{ weather.precipitationProbabilityMax }} %</dd>
       </div>
     </dl>
   </article>
@@ -44,25 +96,18 @@ const { weather, city } = defineProps<{
 
 <style scoped>
 .weather-card {
-  background-color: var(--color-primary);
-  color: var(--color-primary-text);
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  align-items: center;
+  text-align: center;
+  gap: var(--space-lg);
 }
 .weather-card__header {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-md);
-  text-align: center;
-}
-@media (min-width: 768px) {
-  .weather-card__header {
-    flex-direction: row;
-    text-align: left;
-  }
+  gap: var(--space-xs);
 }
 .weather-card__title {
   display: flex;
@@ -77,7 +122,7 @@ const { weather, city } = defineProps<{
   font-family: var(--font-text);
   font-weight: 500;
 }
-.weather-card__weather {
+.weather-card__icon {
 }
 .weather-card__temperature {
   font-family: var(--font-headline);
@@ -85,39 +130,52 @@ const { weather, city } = defineProps<{
   font-size: 60px;
   line-height: 1;
 }
+.weather-card__infos {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+.weather-card__weather {
+  color: var(--weather-text-muted);
+}
+.weather-card__precipitation-temperature {
+}
 .weather-card__stats {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-md);
+  align-self: stretch;
+  border-color: var(--weather-border);
+  background-color: var(--weather-card);
+  color: var(--weather-text);
 }
 @media (min-width: 768px) {
-  .weather-card__stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-@media (min-width: 1200px) {
   .weather-card__stats {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 .weather-card__data {
-  border: 1px solid var(--color-primary-border);
-  border-radius: var(--radius-sm);
-  padding: var(--space-md);
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  align-items: flex-start;
+  align-items: center;
 }
 .weather-card__label {
   font-size: var(--font-size-small);
   font-family: var(--font-text);
-  font-weight: 500;
-  color: var(--color-primary-muted);
+  font-weight: 300;
+  hyphens: auto;
+  word-break: break-word;
+  color: var(--weather-text-muted);
+  order: 1;
+  margin-top: calc(var(--space-xs) * -1);
+}
+.weather-card__icon {
 }
 .weather-card__value {
   font-size: var(--font-size-h3);
   font-family: var(--font-headline);
-  font-weight: 600;
+  font-weight: 500;
+  line-height: 1.2;
 }
 </style>

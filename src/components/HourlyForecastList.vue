@@ -16,7 +16,11 @@ function formatTime(date: string): string {
 </script>
 
 <template>
-  <article v-for="hourly in hourlyForecasts" :key="hourly.date" class="hourly-forecast-card card">
+  <article
+    v-for="hourly in hourlyForecasts"
+    :key="hourly.date"
+    class="hourly-forecast-card card card--small"
+  >
     <h3 class="hourly-forecast-card__time">{{ formatTime(hourly.date) }}</h3>
     <WeatherIcon
       :icon="getWeatherIcon(hourly.weatherCode)"
@@ -28,7 +32,9 @@ function formatTime(date: string): string {
         <dt class="hourly-forecast-card__label">
           <svg
             class="hourly-forecast-card__icon icon icon--xs icon--temperature"
+            role="img"
             aria-hidden="true"
+            focusable="false"
           >
             <use href="#icon-temperature" />
           </svg>
@@ -40,7 +46,9 @@ function formatTime(date: string): string {
         <dt class="hourly-forecast-card__label">
           <svg
             class="hourly-forecast-card__icon icon icon--xs icon--precipitation"
+            role="img"
             aria-hidden="true"
+            focusable="false"
           >
             <use href="#icon-precipitation" />
           </svg>
@@ -54,14 +62,15 @@ function formatTime(date: string): string {
 
 <style scoped>
 .hourly-forecast-card {
-  padding: var(--space-md);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-md);
+  background-color: var(--weather-card);
 }
 .hourly-forecast-card__time {
   font-size: var(--font-size-h3);
+  font-weight: 500;
   line-height: 1.2;
 }
 .hourly-forecast-card__weather {
@@ -69,7 +78,7 @@ function formatTime(date: string): string {
 .hourly-forecast-card__stats {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
 }
 .hourly-forecast-card__data {
   display: flex;
@@ -85,7 +94,5 @@ function formatTime(date: string): string {
 .hourly-forecast-card__icon {
 }
 .hourly-forecast-card__value {
-  font-family: var(--font-text);
-  font-weight: 500;
 }
 </style>
