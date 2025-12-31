@@ -209,19 +209,17 @@ onMounted(() => {
       </div>
     </section>
 
-    <section
-      v-if="dailyForecasts"
-      class="daily-forecasts section"
-      aria-labelledby="daily-forecasts-title"
-    >
-      <h2 id="daily-forecasts-title" class="daily-forecasts__title">
+    <section v-if="dailyForecasts" class="daily-forecasts section">
+      <h2 class="daily-forecasts__title">
         <span class="daily-forecasts__subtitle">7-Tage-Vorhersage für</span> {{ lastSearch }}
       </h2>
+      <div class="daily-forecasts__cards">
       <DailyForecastList
         v-if="dailyForecasts"
         :dailyForecasts="dailyForecasts"
         :city="lastSearch"
       />
+      </div>
     </section>
   </main>
   <footer class="footer">
@@ -292,6 +290,33 @@ onMounted(() => {
 @media (min-width: 1200px) {
   .weather__cards {
     grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.daily-forecasts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.daily-forecasts__title {
+  font-weight: 500;
+  font-size: 1rem;
+}
+.daily-forecasts__cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+@media (min-width: 576px) {
+  .daily-forecasts__cards {
+    display: grid;
+    grid-template-columns: minmax(20%, 1fr) minmax(25%, 1fr) auto;
+    gap: var(--space-md);
+  }
+}
+@media (min-width: 1200px) {
+  .daily-forecasts__cards {
+    grid-template-columns: minmax(20%, 1fr) minmax(25%, 1fr) auto auto;
   }
 }
 

@@ -1,15 +1,14 @@
 <script setup lang="ts">
 // Define props with defaults that this component receives from its parent.
-const { icon, label, size } = withDefaults(
-  defineProps<{
-    icon: string
-    label: string
-    size?: 'sm' | 'md' | 'lg'
-  }>(),
-  {
-    size: 'md',
-  },
-)
+const {
+  icon,
+  label,
+  size = 'md',
+} = defineProps<{
+  icon: string
+  label: string
+  size?: 'sm' | 'md' | 'lg'
+}>()
 
 // Build the file URL for Vite.
 // Assets need to be resolved to a real URL at build time.

@@ -126,7 +126,7 @@ export async function fetchDailyForecasts(location: GeoLocation): Promise<DailyF
   url.searchParams.set('longitude', String(location.longitude))
   url.searchParams.set(
     'daily',
-    'weather_code,temperature_2m_min,temperature_2m_max,sunshine_duration,precipitation_probability_max',
+    'weather_code,temperature_2m_max,temperature_2m_min,sunshine_duration,precipitation_probability_max',
   )
   url.searchParams.set('timezone', 'auto')
 
@@ -143,8 +143,8 @@ export async function fetchDailyForecasts(location: GeoLocation): Promise<DailyF
     daily?: {
       time: string[]
       weather_code: number[]
-      temperature_2m_min: number[]
       temperature_2m_max: number[]
+      temperature_2m_min: number[]
       sunshine_duration: number[]
       precipitation_probability_max: number[]
     }
@@ -160,8 +160,8 @@ export async function fetchDailyForecasts(location: GeoLocation): Promise<DailyF
   const dailyForecasts: DailyForecasts = daily.time.map((date, i) => ({
     date,
     weatherCode: daily.weather_code[i],
-    minTemperature: daily.temperature_2m_min[i],
     maxTemperature: daily.temperature_2m_max[i],
+    minTemperature: daily.temperature_2m_min[i],
     sunshineDuration: daily.sunshine_duration[i],
     precipitationProbabilityMax: daily.precipitation_probability_max[i],
   }))
