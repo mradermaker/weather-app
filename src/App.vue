@@ -67,6 +67,10 @@ async function handleSearch(city: string) {
 onMounted(() => {
   handleSearch(lastSearch.value)
 })
+
+const logoSrc = computed(() =>
+  isDay.value === false ? '/logos/logo-night.svg' : '/logos/logo.svg',
+)
 </script>
 
 <template>
@@ -181,8 +185,8 @@ onMounted(() => {
   </svg>
   <header class="header">
     <div class="header__inner container">
-      <h1 class="header__title">Weather App</h1>
-      <p class="header__subtitle">Aktuelle Wetterdaten & Vorhersage.</p>
+      <img class="header__logo" :src="logoSrc" width="80" height="80" alt="Logo" />
+      <div class="header__switcher">Switcher</div>
     </div>
   </header>
   <main id="main-content" class="main container">
@@ -243,13 +247,23 @@ onMounted(() => {
 .header {
   border-bottom: 1px solid var(--color-border);
   padding-block: var(--space-md);
-  /* backdrop-filter: blur(10px); */
 }
 .header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-.header__title {
+.header__logo {
+  width: 2.5rem;
+  height: 2.5rem;
 }
-.header__subtitle {
+@media (min-width: 1200px) {
+  .header__logo {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+}
+.header__switcher {
 }
 
 .main {
