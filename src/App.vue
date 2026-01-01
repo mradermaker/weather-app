@@ -189,9 +189,13 @@ const logoSrc = computed(() =>
       <div class="header__switcher">Switcher</div>
     </div>
   </header>
-  <main id="main-content" class="main container">
-    <section class="search section" aria-labelledby="search-title">
-      <h2 id="search-title" class="search__title">Ort suchen</h2>
+  <main id="main-content" class="main container" :class="isDay ? '--day' : '--night'">
+    <section class="hero section">
+      <h1 class="hero__title">Wie wird das Wetter?</h1>
+      <p class="hero__text">Aktuelle Wetterdaten & Vorhersage</p>
+    </section>
+
+    <section class="search section">
       <SearchBar :disabled="isLoading" @search="handleSearch" />
       <StateMessage :message="errorMessage" :loading="isLoading" />
       <p v-if="lastSearch" class="search__text">
@@ -267,6 +271,17 @@ const logoSrc = computed(() =>
 }
 
 .main {
+  display: flex;
+  flex-direction: column;
+  gap: 0 var(--space-lg);
+}
+@media (min-width: 1200px) {
+  .main {
+  }
+}
+
+.hero {
+  text-align: center;
 }
 
 .search {
