@@ -34,6 +34,7 @@ const isoDate = today.toISOString().split('T')[0]
       :label="getWeatherLabel(weather.weatherCode)"
       class="weather-card__icon"
       size="lg"
+      :is-day="weather.isDay"
     />
     <p class="weather-card__temperature">{{ weather.temperature }} °C</p>
     <div class="weather-card__infos">

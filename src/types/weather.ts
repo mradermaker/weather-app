@@ -53,6 +53,9 @@ export interface DailyForecast {
 
   // Precipitation probability maximum (%)
   precipitationProbabilityMax: number
+
+  // True if it is currently day, false if night
+  isDay: boolean
 }
 
 export type DailyForecasts = DailyForecast[]
@@ -69,6 +72,9 @@ export interface HourlyForecast {
 
   // Precipitation probability (%)
   precipitationProbability: number
+
+  // True if it is currently day, false if night
+  isDay: boolean
 }
 
 export type HourlyForecasts = HourlyForecast[]

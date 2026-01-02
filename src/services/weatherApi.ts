@@ -128,6 +128,7 @@ export async function fetchDailyForecasts(location: GeoLocation): Promise<DailyF
     'daily',
     'weather_code,temperature_2m_max,temperature_2m_min,sunshine_duration,precipitation_probability_max',
   )
+  url.searchParams.set('current', 'is_day')
   url.searchParams.set('timezone', 'auto')
 
   // fetch data from api
@@ -148,6 +149,9 @@ export async function fetchDailyForecasts(location: GeoLocation): Promise<DailyF
       sunshine_duration: number[]
       precipitation_probability_max: number[]
     }
+    current?: {
+      is_day: 0 | 1
+    }
   }
 
   // error if no results
@@ -164,6 +168,7 @@ export async function fetchDailyForecasts(location: GeoLocation): Promise<DailyF
     minTemperature: daily.temperature_2m_min[i],
     sunshineDuration: daily.sunshine_duration[i],
     precipitationProbabilityMax: daily.precipitation_probability_max[i],
+    isDay: data.current?.is_day === 1,
   }))
 
   return dailyForecasts
@@ -175,7 +180,7 @@ export async function fetchHourlyForecasts(location: GeoLocation): Promise<Hourl
   const url = new URL(WEATHER_BASE_URL)
   url.searchParams.set('latitude', String(location.latitude))
   url.searchParams.set('longitude', String(location.longitude))
-  url.searchParams.set('hourly', 'weather_code,temperature_2m,precipitation_probability')
+  url.searchParams.set('hourly', 'weather_code,temperature_2m,precipitation_probability,is_day')
   url.searchParams.set('timezone', 'auto')
 
   // fetch data from api
@@ -193,6 +198,7 @@ export async function fetchHourlyForecasts(location: GeoLocation): Promise<Hourl
       weather_code: number[]
       temperature_2m: number[]
       precipitation_probability: number[]
+      is_day: (0 | 1)[]
     }
   }
 
@@ -208,6 +214,7 @@ export async function fetchHourlyForecasts(location: GeoLocation): Promise<Hourl
     weatherCode: hourly.weather_code[i],
     temperature: hourly.temperature_2m[i],
     precipitationProbability: hourly.precipitation_probability[i],
+    isDay: hourly.is_day[i] === 1,
   }))
 
   const now = new Date()

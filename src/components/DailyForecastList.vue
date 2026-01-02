@@ -46,6 +46,7 @@ function formatHour(seconds: number): string {
           :icon="getWeatherIcon(daily.weatherCode)"
           :label="getWeatherLabel(daily.weatherCode)"
           class="daily-forecast-card__weather-icon"
+          :is-day="daily.isDay"
         />
       </dt>
       <dd class="daily-forecast-card__weather-value">{{ getWeatherLabel(daily.weatherCode) }}</dd>

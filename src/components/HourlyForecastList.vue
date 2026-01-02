@@ -26,6 +26,7 @@ function formatTime(date: string): string {
       :icon="getWeatherIcon(hourly.weatherCode)"
       :label="getWeatherLabel(hourly.weatherCode)"
       class="hourly-forecast-card__weather"
+      :is-day="hourly.isDay"
     />
     <dl class="hourly-forecast-card__stats">
       <div class="hourly-forecast-card__data">
