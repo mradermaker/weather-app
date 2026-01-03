@@ -261,18 +261,18 @@ const logoSrc = computed(() =>
     <section class="search section">
       <SearchBar v-model:city="searchInput" :disabled="isLoading" @search="handleSearch" />
       <StateMessage :message="errorMessage" :loading="isLoading" />
-      <p v-if="currentCity || previousCity" class="search__text">
-        <span v-if="currentCity" class="search__current"
-          >Aktueller Ort:
+      <div v-if="currentCity || previousCity" class="search__wrapper">
+        <p v-if="currentCity" class="search__text">
+          Aktueller Ort:
           <strong>{{ currentCity }}</strong>
-        </span>
-        <span v-if="previousCity" class="search__latest"
-          >Zuletzt gesuchter Ort:
+        </p>
+        <p v-if="previousCity" class="search__text">
+          Zuletzt gesuchter Ort:
           <a href="#" @click.prevent="handleSearch(previousCity!)">
             <strong>{{ previousCity }}</strong>
           </a>
-        </span>
-      </p>
+        </p>
+      </div>
     </section>
 
     <section v-if="currentWeather || hourlyForecasts" class="weather card">
@@ -301,9 +301,10 @@ const logoSrc = computed(() =>
     <div class="footer__inner container">
       <p class="footer__text">
         Wetterdaten von
-        <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a
-        ><span class="separator">•</span
-        ><a
+        <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>
+      </p>
+      <p class="footer__text">
+        <a
           href="https://github.com/mradermaker/weather-app"
           target="_blank"
           rel="noopener noreferrer"
@@ -402,18 +403,26 @@ const logoSrc = computed(() =>
   flex-direction: column;
   gap: var(--space-md);
 }
+.search__wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
 .search__text {
   display: flex;
-  gap: var(--space-sm);
+  gap: var(--space-xs);
+  flex-wrap: wrap;
 }
-.search__current {
-}
-.search__latest {
-  display: flex;
-  gap: var(--space-sm);
-}
-.search__current + .search__latest::before {
-  content: '•';
+@media (min-width: 1200px) {
+  .search__wrapper {
+    flex-direction: row;
+  }
+  .search__text + .search__text::before {
+    content: '•';
+    display: inline-block;
+    margin-right: var(--space-xs);
+  }
 }
 
 .weather {
@@ -479,7 +488,24 @@ const logoSrc = computed(() =>
   padding-block: var(--space-md);
 }
 .footer__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
 }
 .footer__text {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+@media (min-width: 768px) {
+  .footer__inner {
+    flex-direction: row;
+  }
+  .footer__text + .footer__text::before {
+    content: '•';
+    display: inline-block;
+    margin-right: var(--space-xs);
+  }
 }
 </style>
