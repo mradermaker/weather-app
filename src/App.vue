@@ -104,8 +104,9 @@ onMounted(() => {
   handleSearch(currentCity.value)
 })
 
+const base = import.meta.env.BASE_URL
 const logoSrc = computed(() =>
-  isDay.value === false ? '/logos/logo-night.svg' : '/logos/logo.svg',
+  isDay.value === false ? `${base}/logos/logo-night.svg` : `${base}/logos/logo.svg`,
 )
 </script>
 
