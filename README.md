@@ -1,48 +1,62 @@
-# weather-app
+# Weather App
 
-This template should help get you started developing with Vue 3 in Vite.
+A responsive weather application built with Vue 3 and TypeScript.
+It provides current weather data, hourly forecasts, and daily forecasts
+based on user-selected locations.
 
-## Recommended IDE Setup
+## Features
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- City search with geocoding
+- Current weather overview
+- Hourly forecast (next hours from now)
+- Daily forecast (7 days)
+- Light / Dark theme with system preference fallback
+- Accessible UI (keyboard navigation, ARIA, semantic HTML)
+- Error and loading states
+- Persistent settings via localStorage
 
-## Recommended Browser Setup
+## Tech Stack
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+- Vue 3 (Composition API)
+- TypeScript
+- Vite
+- HTML & CSS with CSS variables
+- Open-Meteo API
 
-## Type Support for `.vue` Imports in TS
+## Accessibility
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- Semantic HTML (fieldset, legend, dl, time)
+- Screen reader support via ARIA
+- Visible focus states
+- Keyboard navigation
 
-## Customize configuration
+## Data Source
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+Weather data is provided by the Open-Meteo API.
+No API key is required.
 
-## Project Setup
+## Development
 
-```sh
+Install dependencies:
+
+```bash
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+Start the development server with hot reload:
 
-```sh
+```bash
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+Type-check, compile and minify for production:
 
-```sh
+```bash
 npm run build
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+Run ESLint:
 
-```sh
+```bash
 npm run lint
 ```
