@@ -18,15 +18,6 @@ const STORAGE_KEY = 'weather-app:last-city' // namespaced to avoid collisions wi
 const DEFAULT_CITY = 'Berlin'
 const THEME_KEY = 'weather-app:theme'
 
-// initial city (localStorage or fallback)
-function getInitialCity(): string {
-  const storedCity = localStorage.getItem(STORAGE_KEY)
-  if (!storedCity) return DEFAULT_CITY
-
-  const trimmed = storedCity.trim()
-  return trimmed || DEFAULT_CITY
-}
-
 // initial theme (localStorage or fallback)
 function getInitialTheme(): Theme {
   const storedTheme = localStorage.getItem(THEME_KEY)
@@ -46,7 +37,18 @@ function applyTheme(value: 'light' | 'dark') {
   localStorage.setItem(THEME_KEY, value)
 }
 
-const lastSearch = ref<string>(getInitialCity())
+// initial city (localStorage or fallback)
+function getInitialCity(): string {
+  const storedCity = localStorage.getItem(STORAGE_KEY)
+  if (!storedCity) return DEFAULT_CITY
+
+  const trimmed = storedCity.trim()
+  return trimmed || DEFAULT_CITY
+}
+
+const currentCity = ref<string>(getInitialCity())
+const previousCity = ref<string | null>(null)
+const searchInput = ref(currentCity.value)
 
 const currentWeather = ref<CurrentWeather | null>(null)
 
@@ -71,7 +73,12 @@ async function handleSearch(city: string) {
       return
     }
 
-    lastSearch.value = city
+    if (currentCity.value && currentCity.value !== city) {
+      previousCity.value = currentCity.value
+    }
+
+    currentCity.value = city
+    searchInput.value = city
     localStorage.setItem(STORAGE_KEY, city)
 
     currentWeather.value = await fetchCurrentWeather(location)
@@ -94,7 +101,7 @@ watch(
 
 // trigger initial search and theme after first render
 onMounted(() => {
-  handleSearch(lastSearch.value)
+  handleSearch(currentCity.value)
 })
 
 const logoSrc = computed(() =>
@@ -252,37 +259,41 @@ const logoSrc = computed(() =>
     </section>
 
     <section class="search section">
-      <SearchBar :disabled="isLoading" @search="handleSearch" />
+      <SearchBar v-model:city="searchInput" :disabled="isLoading" @search="handleSearch" />
       <StateMessage :message="errorMessage" :loading="isLoading" />
-      <p v-if="lastSearch" class="search__text">
-        Zuletzt gesuchter Ort:
-        <strong>{{ lastSearch }}</strong>
+      <p v-if="currentCity || previousCity" class="search__text">
+        <span v-if="currentCity" class="search__current"
+          >Aktueller Ort:
+          <strong>{{ currentCity }}</strong>
+        </span>
+        <span v-if="previousCity" class="search__latest"
+          >Zuletzt gesuchter Ort:
+          <a href="#" @click.prevent="handleSearch(previousCity!)">
+            <strong>{{ previousCity }}</strong>
+          </a>
+        </span>
       </p>
     </section>
 
     <section v-if="currentWeather || hourlyForecasts" class="weather card">
       <div v-if="currentWeather" class="weather__wrapper">
         <h2 class="weather__title">Aktuelles Wetter</h2>
-        <WeatherCard :weather="currentWeather" :city="lastSearch" />
+        <WeatherCard :weather="currentWeather" :city="currentCity" />
       </div>
       <div v-if="hourlyForecasts" class="weather__wrapper">
         <h2 class="weather__title">Stündliche Vorhersage</h2>
         <div class="weather__cards">
-          <HourlyForecastList :hourlyForecasts="hourlyForecasts" :city="lastSearch" />
+          <HourlyForecastList :hourlyForecasts="hourlyForecasts" />
         </div>
       </div>
     </section>
 
     <section v-if="dailyForecasts" class="daily-forecasts section">
       <h2 class="daily-forecasts__title">
-        <span class="daily-forecasts__subtitle">7-Tage-Vorhersage für</span> {{ lastSearch }}
+        <span class="daily-forecasts__subtitle">7-Tage-Vorhersage für</span> {{ currentCity }}
       </h2>
       <div class="daily-forecasts__cards">
-      <DailyForecastList
-        v-if="dailyForecasts"
-        :dailyForecasts="dailyForecasts"
-        :city="lastSearch"
-      />
+        <DailyForecastList v-if="dailyForecasts" :dailyForecasts="dailyForecasts" />
       </div>
     </section>
   </main>
@@ -391,6 +402,19 @@ const logoSrc = computed(() =>
   flex-direction: column;
   gap: var(--space-md);
 }
+.search__text {
+  display: flex;
+  gap: var(--space-sm);
+}
+.search__current {
+}
+.search__latest {
+  display: flex;
+  gap: var(--space-sm);
+}
+.search__current + .search__latest::before {
+  content: '•';
+}
 
 .weather {
   display: flex;
@@ -441,8 +465,7 @@ const logoSrc = computed(() =>
 @media (min-width: 576px) {
   .daily-forecasts__cards {
     display: grid;
-    grid-template-columns: minmax(20%, 1fr) minmax(25%, 1fr) auto;
-    gap: var(--space-md);
+    grid-template-columns: minmax(15%, 1fr) minmax(30%, 1fr) auto;
   }
 }
 @media (min-width: 1200px) {
