@@ -181,6 +181,7 @@ export async function fetchHourlyForecasts(location: GeoLocation): Promise<Hourl
   url.searchParams.set('latitude', String(location.latitude))
   url.searchParams.set('longitude', String(location.longitude))
   url.searchParams.set('hourly', 'weather_code,temperature_2m,precipitation_probability,is_day')
+  url.searchParams.set('current', 'is_day')
   url.searchParams.set('timezone', 'auto')
 
   // fetch data from api
@@ -200,10 +201,15 @@ export async function fetchHourlyForecasts(location: GeoLocation): Promise<Hourl
       precipitation_probability: number[]
       is_day: (0 | 1)[]
     }
+    current?: {
+      time: string
+    }
   }
 
+  const currentTime = data.current?.time
+
   // error if no results
-  if (!data.hourly) {
+  if (!currentTime || !data.hourly) {
     throw new Error('No hourly forecast data')
   }
 
@@ -217,13 +223,9 @@ export async function fetchHourlyForecasts(location: GeoLocation): Promise<Hourl
     isDay: hourly.is_day[i] === 1,
   }))
 
-  const now = new Date()
+  const startIndex = hourly.time.findIndex((t) => t >= currentTime)
 
-  hourlyForecasts = hourlyForecasts.filter((entry) => {
-    return new Date(entry.date) >= now
-  })
-
-  hourlyForecasts = hourlyForecasts.slice(0, 6)
+  hourlyForecasts = hourlyForecasts.slice(startIndex, startIndex + 6)
 
   return hourlyForecasts
 }
