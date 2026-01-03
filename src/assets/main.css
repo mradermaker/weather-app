@@ -33,7 +33,7 @@
   --shadow-md: 0 4px 12px color-mix(in srgb, var(--color-text) 10%, transparent);
 
   /* Font */
-  --font-headline: 'Albert Sans', system-ui, sans-serif;
+  --font-headline: 'Inter', system-ui, sans-serif;
   --font-text: 'Inter', system-ui, sans-serif;
 
   --font-size-base: 18px;
@@ -296,7 +296,6 @@ button {
 
 .field__label {
   font-size: var(--font-size-small);
-  font-weight: 400;
 }
 
 .field__control {
