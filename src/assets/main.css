@@ -4,7 +4,7 @@
 
 :root {
   /* Colors */
-  --color-bg: #f9fafb;
+  --color-bg: #f6f7f9;
   --color-bg-card: #ffffff;
   --color-text: #131926;
   --color-text-muted: color-mix(in srgb, var(--color-text) 60%, transparent);
@@ -76,6 +76,35 @@
     --shadow-sm: none;
     --shadow-md: none;
   }
+}
+
+/* Manual override preferences */
+html[data-theme='light'] {
+  --color-bg: #f6f7f9;
+  --color-bg-card: #ffffff;
+  --color-text: #131926;
+
+  --color-primary: #2563eb;
+  --color-primary-text: #ffffff;
+
+  --weather-card: color-mix(in srgb, var(--color-text) 20%, transparent);
+
+  --color-error: #b90606;
+  --color-success: #007033;
+}
+
+html[data-theme='dark'] {
+  --color-bg: #080824;
+  --color-bg-card: #0e0e32;
+  --color-text: #e5e7eb;
+
+  --color-primary: #38a6fa;
+  --color-primary-text: #080824;
+
+  --weather-card: color-mix(in srgb, var(--color-bg) 20%, transparent);
+
+  --color-error: #fcabab;
+  --color-success: #b1fcac;
 }
 
 .--night {

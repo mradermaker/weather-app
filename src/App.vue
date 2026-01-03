@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import SearchBar from './components/SearchBar.vue'
 import WeatherCard from './components/WeatherCard.vue'
 import DailyForecastList from './components/DailyForecastList.vue'
@@ -12,9 +12,11 @@ import {
   fetchHourlyForecasts,
 } from '@/services/weatherApi'
 import type { CurrentWeather, DailyForecasts, HourlyForecasts } from '@/types/weather'
+import type { Theme } from '@/types/theme'
 
 const STORAGE_KEY = 'weather-app:last-city' // namespaced to avoid collisions with other apps
 const DEFAULT_CITY = 'Berlin'
+const THEME_KEY = 'weather-app:theme'
 
 // initial city (localStorage or fallback)
 function getInitialCity(): string {
@@ -23,6 +25,25 @@ function getInitialCity(): string {
 
   const trimmed = storedCity.trim()
   return trimmed || DEFAULT_CITY
+}
+
+// initial theme (localStorage or fallback)
+function getInitialTheme(): Theme {
+  const storedTheme = localStorage.getItem(THEME_KEY)
+  if (storedTheme === 'light' || storedTheme === 'dark') {
+    return storedTheme
+  }
+
+  // fallback to system preference
+  const sytemPreference = window.matchMedia('(prefers-color-scheme: light)').matches
+  return sytemPreference ? 'light' : 'dark'
+}
+
+const theme = ref<Theme>(getInitialTheme())
+
+function applyTheme(value: 'light' | 'dark') {
+  document.documentElement.dataset.theme = value
+  localStorage.setItem(THEME_KEY, value)
 }
 
 const lastSearch = ref<string>(getInitialCity())
@@ -63,7 +84,15 @@ async function handleSearch(city: string) {
   }
 }
 
-// trigger initial search after first render
+watch(
+  theme,
+  (value) => {
+    applyTheme(value)
+  },
+  { immediate: true },
+)
+
+// trigger initial search and theme after first render
 onMounted(() => {
   handleSearch(lastSearch.value)
 })
@@ -186,7 +215,34 @@ const logoSrc = computed(() =>
   <header class="header">
     <div class="header__inner container">
       <img class="header__logo" :src="logoSrc" width="80" height="80" alt="Logo" />
-      <div class="header__switcher">Switcher</div>
+      <div class="header__switcher">
+        <fieldset class="theme-switch">
+          <legend class="sr-only">Farbschema wählen</legend>
+          <label class="theme-switch__option">
+            <input
+              type="radio"
+              name="theme"
+              value="light"
+              class="theme-switch__input"
+              :checked="theme === 'light'"
+              @change="theme = 'light'"
+            />
+            <span class="theme-switch__label">Light</span>
+          </label>
+
+          <label class="theme-switch__option">
+            <input
+              type="radio"
+              name="theme"
+              value="dark"
+              class="theme-switch__input"
+              :checked="theme === 'dark'"
+              @change="theme = 'dark'"
+            />
+            <span class="theme-switch__label">Dark</span>
+          </label>
+        </fieldset>
+      </div>
     </div>
   </header>
   <main id="main-content" class="main container" :class="isDay ? '--day' : '--night'">
@@ -268,6 +324,52 @@ const logoSrc = computed(() =>
   }
 }
 .header__switcher {
+}
+
+.theme-switch {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: inline-flex;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: var(--space-xs);
+  gap: var(--space-xs);
+}
+.theme-switch__option {
+  position: relative;
+  cursor: pointer;
+}
+.theme-switch__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.theme-switch__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-round);
+  font-size: var(--font-size-small);
+  font-weight: 500;
+  color: var(--color-text);
+  background: transparent;
+  transition:
+    background-color 0.25s ease-in-out,
+    color 0.25s ease-in-out;
+}
+.theme-switch__label:hover {
+  background-color: var(--color-bg);
+}
+.theme-switch__option .theme-switch__input:checked + .theme-switch__label {
+  background: var(--color-primary);
+  color: var(--color-primary-text);
+}
+.theme-switch__option .theme-switch__input:focus-visible + .theme-switch__label {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .main {
