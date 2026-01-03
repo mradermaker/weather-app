@@ -41,6 +41,8 @@ export async function searchCity(query: string): Promise<GeoLocation | null> {
   // use first result
   const first = data.results[0]
 
+  if (!first) return null
+
   const location: GeoLocation = {
     id: first.id,
     name: first.name,
@@ -163,12 +165,12 @@ export async function fetchDailyForecasts(location: GeoLocation): Promise<DailyF
 
   const dailyForecasts: DailyForecasts = daily.time.map((date, i) => ({
     date,
-    weatherCode: daily.weather_code[i],
-    maxTemperature: daily.temperature_2m_max[i],
-    minTemperature: daily.temperature_2m_min[i],
-    sunshineDuration: daily.sunshine_duration[i],
-    precipitationProbabilityMax: daily.precipitation_probability_max[i],
-    isDay: data.current?.is_day === 1,
+    weatherCode: daily.weather_code[i] ?? -1,
+    maxTemperature: daily.temperature_2m_max[i] ?? 0,
+    minTemperature: daily.temperature_2m_min[i] ?? 0,
+    sunshineDuration: daily.sunshine_duration[i] ?? 0,
+    precipitationProbabilityMax: daily.precipitation_probability_max[i] ?? 0,
+    isDay: (data.current?.is_day ?? 0) === 1,
   }))
 
   return dailyForecasts
@@ -217,10 +219,10 @@ export async function fetchHourlyForecasts(location: GeoLocation): Promise<Hourl
 
   let hourlyForecasts: HourlyForecasts = hourly.time.map((date, i) => ({
     date,
-    weatherCode: hourly.weather_code[i],
-    temperature: hourly.temperature_2m[i],
-    precipitationProbability: hourly.precipitation_probability[i],
-    isDay: hourly.is_day[i] === 1,
+    weatherCode: hourly.weather_code[i] ?? -1,
+    temperature: hourly.temperature_2m[i] ?? 0,
+    precipitationProbability: hourly.precipitation_probability[i] ?? 0,
+    isDay: (hourly.is_day[i] ?? 0) === 1,
   }))
 
   const startIndex = hourly.time.findIndex((t) => t >= currentTime)
