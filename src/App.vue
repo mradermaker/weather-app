@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, reactive, watch } from 'vue'
 import SearchBar from './components/SearchBar.vue'
 import WeatherCard from './components/WeatherCard.vue'
 import DailyForecastList from './components/DailyForecastList.vue'
+import LastCities from './components/LastCities.vue'
 import HourlyForecastList from './components/HourlyForecastList.vue'
 import StateMessage from './components/StateMessage.vue'
 import {
@@ -14,9 +15,11 @@ import {
 import type { GeoLocation, CurrentWeather, DailyForecasts, HourlyForecasts } from '@/types/weather'
 import type { Theme } from '@/types/theme'
 
-const STORAGE_KEY = 'weather-app:last-city' // namespaced to avoid collisions with other apps
-const DEFAULT_CITY = 'Berlin'
+// namespaced to avoid collisions with other apps
 const THEME_KEY = 'weather-app:theme'
+
+const CITIES_KEY = 'weather-app:last-cities'
+const DEFAULT_CITIES = ['Berlin']
 
 // Theme
 function getInitialTheme(): Theme {
@@ -38,18 +41,21 @@ function applyTheme(value: Theme) {
 }
 
 // City / Location
-function getInitialCity(): string {
-  const storedCity = localStorage.getItem(STORAGE_KEY)
-  if (!storedCity) return DEFAULT_CITY
-
-  const trimmed = storedCity.trim()
-  return trimmed || DEFAULT_CITY
+function getLastCities(): string[] {
+  const storedCities = localStorage.getItem(CITIES_KEY)
+  if (!storedCities) return DEFAULT_CITIES
+  try {
+    const cities = JSON.parse(storedCities) as string[]
+    return cities
+  } catch {
+    return DEFAULT_CITIES
+  }
 }
 
-const currentCity = ref<string>(getInitialCity())
-const previousCity = ref<string | null>(null)
+const initialCities = getLastCities()
+const lastCities = ref<string[]>(initialCities)
+const currentCity = ref<string>(initialCities[0] as string)
 const searchInput = ref(currentCity.value)
-
 const currentLocation = ref<GeoLocation | null>(null)
 
 // Weather Data
@@ -62,6 +68,22 @@ const hourlyForecasts = ref<HourlyForecasts | null>(null)
 const daysToShow = ref(7)
 
 const isDay = computed(() => currentWeather.value?.isDay)
+
+const weatherMap = reactive<
+  Record<string, { weatherCode: number; temperature: number; isDay: boolean }>
+>({})
+
+async function updateWeatherForCity(city: string) {
+  const location = await searchCity(city)
+  if (!location) return
+
+  const weather = await fetchCurrentWeather(location)
+  weatherMap[city] = {
+    weatherCode: weather.weatherCode,
+    temperature: weather.temperature,
+    isDay: weather.isDay,
+  }
+}
 
 const isLoading = ref(false)
 
@@ -82,18 +104,33 @@ async function handleSearch(city: string) {
     // Save Location
     currentLocation.value = location
 
-    if (currentCity.value && currentCity.value !== city) {
-      previousCity.value = currentCity.value
+    city = city.trim()
+    if (!city) return
+    currentCity.value = city
+
+    const index = lastCities.value.indexOf(city)
+    if (index !== -1) lastCities.value.splice(index, 1)
+    lastCities.value.unshift(city)
+
+    if (lastCities.value.length > 4) {
+      lastCities.value = lastCities.value.slice(0, 4)
     }
 
-    currentCity.value = city
+    localStorage.setItem(CITIES_KEY, JSON.stringify(lastCities.value))
+
     searchInput.value = city
-    localStorage.setItem(STORAGE_KEY, city)
 
     // Fetch
     currentWeather.value = await fetchCurrentWeather(location)
     dailyForecasts.value = await fetchDailyForecasts(location, daysToShow.value)
     hourlyForecasts.value = await fetchHourlyForecasts(location)
+
+    // Save weather
+    weatherMap[city] = {
+      weatherCode: currentWeather.value.weatherCode,
+      temperature: currentWeather.value.temperature,
+      isDay: currentWeather.value.isDay,
+    }
   } catch {
     errorMessage.value = 'Daten konnten nicht geladen werden'
   } finally {
@@ -110,9 +147,16 @@ watch(daysToShow, async (newDays) => {
 })
 
 // On Mounted
-onMounted(() => {
-  // trigger initial search after first render
-  handleSearch(currentCity.value)
+onMounted(async () => {
+  // load weather for last cities
+  for (const city of lastCities.value) {
+    if (city !== currentCity.value && !weatherMap[city]) {
+      await updateWeatherForCity(city)
+    }
+  }
+
+  // load weather for current weather
+  await handleSearch(currentCity.value)
 })
 
 // Logo
@@ -258,16 +302,10 @@ const logoSrc = computed(() =>
     <section class="search section">
       <SearchBar v-model:city="searchInput" :disabled="isLoading" @search="handleSearch" />
       <StateMessage :message="errorMessage" :loading="isLoading" />
-      <div v-if="currentCity || previousCity" class="search__wrapper">
-        <p v-if="currentCity" class="search__text">
+      <div v-if="currentCity" class="search__wrapper">
+        <p v-if="currentCity" class="search__text sr-only" aria-live="polite">
           Aktueller Ort:
           <strong>{{ currentCity }}</strong>
-        </p>
-        <p v-if="previousCity" class="search__text">
-          Zuletzt gesuchter Ort:
-          <a href="#" @click.prevent="handleSearch(previousCity!)">
-            <strong>{{ previousCity }}</strong>
-          </a>
         </p>
       </div>
     </section>
@@ -309,6 +347,18 @@ const logoSrc = computed(() =>
       </header>
       <div class="daily-forecasts__cards">
         <DailyForecastList v-if="dailyForecasts" :dailyForecasts="dailyForecasts" />
+      </div>
+    </section>
+
+    <section v-if="lastCities" class="last-cities section">
+      <h2 class="last-cities__title">Zuletzt gesuchte Orte</h2>
+      <div class="last-cities__cards">
+        <LastCities
+          :cities="lastCities"
+          :currentCity="currentCity"
+          :weatherMap="weatherMap"
+          @selectCity="handleSearch"
+        />
       </div>
     </section>
   </main>
@@ -391,6 +441,26 @@ const logoSrc = computed(() =>
     content: '•';
     display: inline-block;
     margin-right: var(--space-xs);
+  }
+}
+
+.last-cities {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.last-cities__title {
+  font-weight: 500;
+  font-size: 1rem;
+}
+.last-cities__cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-md);
+}
+@media (min-width: 768px) {
+  .last-cities__cards {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 

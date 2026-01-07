@@ -18,8 +18,13 @@
     var(--color-primary-text) 20%
   );
 
-  --weather-primary: #2563eb;
-  --weather-secondary: #0579d1;
+  --weather-day-primary: #2563eb;
+  --weather-day-secondary: #0579d1;
+  --weather-night-primary: #1e1b4b;
+  --weather-night-secondary: #1e2876;
+
+  --weather-primary: var(--weather-day-primary);
+  --weather-secondary: var(--weather-day-secondary);
   --weather-text: #ffffff;
   --weather-card: color-mix(in srgb, var(--color-text) 20%, transparent);
   --weather-border: var(--weather-card);
@@ -108,8 +113,8 @@ html[data-theme='dark'] {
 }
 
 .--night {
-  --weather-primary: #1e1b4b;
-  --weather-secondary: #1e2876;
+  --weather-primary: var(--weather-night-primary);
+  --weather-secondary: var(--weather-night-secondary);
 }
 
 /* ------------------------------
