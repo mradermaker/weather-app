@@ -121,7 +121,10 @@ export async function fetchCurrentWeather(location: GeoLocation): Promise<Curren
 }
 
 // fetch daily forecast data for a given location
-export async function fetchDailyForecasts(location: GeoLocation): Promise<DailyForecasts> {
+export async function fetchDailyForecasts(
+  location: GeoLocation,
+  days: number = 7,
+): Promise<DailyForecasts> {
   // build URL with query params
   const url = new URL(WEATHER_BASE_URL)
   url.searchParams.set('latitude', String(location.latitude))
@@ -131,6 +134,7 @@ export async function fetchDailyForecasts(location: GeoLocation): Promise<DailyF
     'weather_code,temperature_2m_max,temperature_2m_min,sunshine_duration,precipitation_probability_max',
   )
   url.searchParams.set('current', 'is_day')
+  url.searchParams.set('forecast_days', days.toString())
   url.searchParams.set('timezone', 'auto')
 
   // fetch data from api

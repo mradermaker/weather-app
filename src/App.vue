@@ -11,14 +11,14 @@ import {
   fetchDailyForecasts,
   fetchHourlyForecasts,
 } from '@/services/weatherApi'
-import type { CurrentWeather, DailyForecasts, HourlyForecasts } from '@/types/weather'
+import type { GeoLocation, CurrentWeather, DailyForecasts, HourlyForecasts } from '@/types/weather'
 import type { Theme } from '@/types/theme'
 
 const STORAGE_KEY = 'weather-app:last-city' // namespaced to avoid collisions with other apps
 const DEFAULT_CITY = 'Berlin'
 const THEME_KEY = 'weather-app:theme'
 
-// initial theme (localStorage or fallback)
+// Theme
 function getInitialTheme(): Theme {
   const storedTheme = localStorage.getItem(THEME_KEY)
   if (storedTheme === 'light' || storedTheme === 'dark') {
@@ -26,18 +26,18 @@ function getInitialTheme(): Theme {
   }
 
   // fallback to system preference
-  const sytemPreference = window.matchMedia('(prefers-color-scheme: light)').matches
-  return sytemPreference ? 'light' : 'dark'
+  const systemPreference = window.matchMedia('(prefers-color-scheme: light)').matches
+  return systemPreference ? 'light' : 'dark'
 }
 
 const theme = ref<Theme>(getInitialTheme())
 
-function applyTheme(value: 'light' | 'dark') {
+function applyTheme(value: Theme) {
   document.documentElement.dataset.theme = value
   localStorage.setItem(THEME_KEY, value)
 }
 
-// initial city (localStorage or fallback)
+// City / Location
 function getInitialCity(): string {
   const storedCity = localStorage.getItem(STORAGE_KEY)
   if (!storedCity) return DEFAULT_CITY
@@ -50,11 +50,16 @@ const currentCity = ref<string>(getInitialCity())
 const previousCity = ref<string | null>(null)
 const searchInput = ref(currentCity.value)
 
+const currentLocation = ref<GeoLocation | null>(null)
+
+// Weather Data
 const currentWeather = ref<CurrentWeather | null>(null)
 
 const dailyForecasts = ref<DailyForecasts | null>(null)
 
 const hourlyForecasts = ref<HourlyForecasts | null>(null)
+
+const daysToShow = ref(7)
 
 const isDay = computed(() => currentWeather.value?.isDay)
 
@@ -62,6 +67,7 @@ const isLoading = ref(false)
 
 const errorMessage = ref<string | null>(null)
 
+// Handle Search
 async function handleSearch(city: string) {
   errorMessage.value = null
   isLoading.value = true
@@ -73,6 +79,9 @@ async function handleSearch(city: string) {
       return
     }
 
+    // Save Location
+    currentLocation.value = location
+
     if (currentCity.value && currentCity.value !== city) {
       previousCity.value = currentCity.value
     }
@@ -81,8 +90,9 @@ async function handleSearch(city: string) {
     searchInput.value = city
     localStorage.setItem(STORAGE_KEY, city)
 
+    // Fetch
     currentWeather.value = await fetchCurrentWeather(location)
-    dailyForecasts.value = await fetchDailyForecasts(location)
+    dailyForecasts.value = await fetchDailyForecasts(location, daysToShow.value)
     hourlyForecasts.value = await fetchHourlyForecasts(location)
   } catch {
     errorMessage.value = 'Daten konnten nicht geladen werden'
@@ -91,19 +101,21 @@ async function handleSearch(city: string) {
   }
 }
 
-watch(
-  theme,
-  (value) => {
-    applyTheme(value)
-  },
-  { immediate: true },
-)
+// Watchers
+watch(theme, (value) => applyTheme(value), { immediate: true })
 
-// trigger initial search and theme after first render
+watch(daysToShow, async (newDays) => {
+  if (!currentLocation.value) return
+  dailyForecasts.value = await fetchDailyForecasts(currentLocation.value, newDays)
+})
+
+// On Mounted
 onMounted(() => {
+  // trigger initial search after first render
   handleSearch(currentCity.value)
 })
 
+// Logo
 const base = import.meta.env.BASE_URL
 const logoSrc = computed(() =>
   isDay.value === false ? `${base}/logos/logo-night.svg` : `${base}/logos/logo.svg`,
@@ -223,34 +235,18 @@ const logoSrc = computed(() =>
   <header class="header">
     <div class="header__inner container">
       <img class="header__logo" :src="logoSrc" width="80" height="80" alt="Logo" />
-      <div class="header__switcher">
-        <fieldset class="theme-switch">
-          <legend class="sr-only">Farbschema wählen</legend>
-          <label class="theme-switch__option">
-            <input
-              type="radio"
-              name="theme"
-              value="light"
-              class="theme-switch__input"
-              :checked="theme === 'light'"
-              @change="theme = 'light'"
-            />
-            <span class="theme-switch__label">Light</span>
-          </label>
+      <fieldset class="header__switch switch">
+        <legend class="sr-only">Farbschema wählen</legend>
+        <label class="switch__option">
+          <input type="radio" name="theme" class="switch__input" value="light" v-model="theme" />
+          <span class="switch__label">Light</span>
+        </label>
 
-          <label class="theme-switch__option">
-            <input
-              type="radio"
-              name="theme"
-              value="dark"
-              class="theme-switch__input"
-              :checked="theme === 'dark'"
-              @change="theme = 'dark'"
-            />
-            <span class="theme-switch__label">Dark</span>
-          </label>
-        </fieldset>
-      </div>
+        <label class="switch__option">
+          <input type="radio" name="theme" class="switch__input" value="dark" v-model="theme" />
+          <span class="switch__label">Dark</span>
+        </label>
+      </fieldset>
     </div>
   </header>
   <main id="main-content" class="main container" :class="isDay ? '--day' : '--night'">
@@ -290,9 +286,27 @@ const logoSrc = computed(() =>
     </section>
 
     <section v-if="dailyForecasts" class="daily-forecasts section">
-      <h2 class="daily-forecasts__title">
-        <span class="daily-forecasts__subtitle">7-Tage-Vorhersage für</span> {{ currentCity }}
-      </h2>
+      <header class="daily-forecasts__header">
+        <h2 class="daily-forecasts__title">
+          <span class="daily-forecasts__subtitle"> Tägliche Vorhersage für</span>
+          {{ currentCity }}
+        </h2>
+        <fieldset class="daily-forecasts__switch switch">
+          <legend class="sr-only">Tage wählen</legend>
+          <label class="switch__option">
+            <input type="radio" name="days" class="switch__input" value="7" v-model="daysToShow" />
+            <span class="switch__label">7 Tage</span>
+          </label>
+
+          <label class="switch__option">
+            <input type="radio" name="days" class="switch__input" value="14" v-model="daysToShow" />
+            <span class="switch__label">14 Tage</span>
+          </label>
+        </fieldset>
+        <p class="daily-forecasts__status sr-only" aria-live="polite">
+          Du hast {{ daysToShow }} Tage ausgewählt.
+        </p>
+      </header>
       <div class="daily-forecasts__cards">
         <DailyForecastList v-if="dailyForecasts" :dailyForecasts="dailyForecasts" />
       </div>
@@ -336,53 +350,7 @@ const logoSrc = computed(() =>
     height: 3.5rem;
   }
 }
-.header__switcher {
-}
-
-.theme-switch {
-  border: 0;
-  padding: 0;
-  margin: 0;
-  display: inline-flex;
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: 999px;
-  padding: var(--space-xs);
-  gap: var(--space-xs);
-}
-.theme-switch__option {
-  position: relative;
-  cursor: pointer;
-}
-.theme-switch__input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-.theme-switch__label {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-round);
-  font-size: var(--font-size-small);
-  font-weight: 500;
-  color: var(--color-text);
-  background: transparent;
-  transition:
-    background-color 0.25s ease-in-out,
-    color 0.25s ease-in-out;
-}
-.theme-switch__label:hover {
-  background-color: var(--color-bg);
-}
-.theme-switch__option .theme-switch__input:checked + .theme-switch__label {
-  background: var(--color-primary);
-  color: var(--color-primary-text);
-}
-.theme-switch__option .theme-switch__input:focus-visible + .theme-switch__label {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
+.header__switch {
 }
 
 .main {
@@ -463,9 +431,27 @@ const logoSrc = computed(() =>
   flex-direction: column;
   gap: var(--space-md);
 }
+.daily-forecasts__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  align-items: flex-start;
+}
+@media (min-width: 576px) {
+  .daily-forecasts__header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
 .daily-forecasts__title {
   font-weight: 500;
   font-size: 1rem;
+}
+.daily-forecasts__switch {
+  align-self: flex-end;
+}
+.daily-forecasts__status {
 }
 .daily-forecasts__cards {
   display: flex;

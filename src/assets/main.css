@@ -371,6 +371,53 @@ input::placeholder {
   }
 }
 
+/* Switch */
+.switch {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: inline-flex;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: var(--space-xs);
+  gap: var(--space-xs);
+}
+.switch__option {
+  position: relative;
+  cursor: pointer;
+}
+.switch__input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.switch__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-round);
+  font-size: var(--font-size-small);
+  font-weight: 500;
+  color: var(--color-text);
+  background: transparent;
+  transition:
+    background-color 0.25s ease-in-out,
+    color 0.25s ease-in-out;
+}
+.switch__label:hover {
+  background-color: var(--color-bg);
+}
+.switch__option .switch__input:checked + .switch__label {
+  background: var(--color-primary);
+  color: var(--color-primary-text);
+}
+.switch__option .switch__input:focus-visible + .switch__label {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 /* ------------------------------
    5. Accessibility
 ---------------------------------*/
